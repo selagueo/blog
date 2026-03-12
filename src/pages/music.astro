@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const albums = [
+  {
+    title: 'Add your first album',
+    artist: 'Artist Name',
+    note: 'Edit src/pages/music.astro to add your music picks.',
+  },
+];
+---
+
+<BaseLayout title="Music" description="What I'm listening to.">
+  <h1 class="text-3xl font-semibold tracking-tight mb-2">Music</h1>
+  <p class="text-(--color-text-secondary) mb-10">What's on rotation.</p>
+
+  <ul class="space-y-4">
+    {albums.map(album => (
+      <li class="border-b border-(--color-border) pb-4">
+        <div class="flex items-baseline justify-between gap-4">
+          <span class="font-medium">{album.title}</span>
+          <span class="text-sm text-(--color-text-secondary) shrink-0">{album.artist}</span>
+        </div>
+        {album.note && (
+          <p class="text-sm text-(--color-text-secondary) mt-1">{album.note}</p>
+        )}
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

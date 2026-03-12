@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .filter(p => !p.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const projects = (await getCollection('projects'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<BaseLayout title="Home">
+  <section class="mb-16">
+    <h1 class="text-3xl font-semibold tracking-tight mb-4">José Lagos</h1>
+    <p class="text-(--color-text-secondary) text-lg leading-relaxed max-w-xl">
+      Developer, maker, and occasional writer. Building things, reading books, and listening to music. Based in the internet.
+    </p>
+    <div class="flex gap-4 mt-6 text-sm">
+      <a href="/about" class="text-(--color-accent) hover:underline">More about me &rarr;</a>
+      <a href="https://instagram.com/selagueo" target="_blank" rel="noopener" class="text-(--color-text-secondary) hover:text-(--color-text) transition-colors">@selagueo</a>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold tracking-tight">Recent posts</h2>
+      <a href="/blog" class="text-sm text-(--color-text-secondary) hover:text-(--color-text) transition-colors">View all &rarr;</a>
+    </div>
+    {posts.length > 0 ? (
+      <ul class="space-y-4">
+        {posts.map(post => (
+          <li>
+            <a href={`/blog/${post.id}`} class="group block">
+              <div class="flex items-baseline justify-between gap-4">
+                <span class="font-medium group-hover:text-(--color-accent) transition-colors">{post.data.title}</span>
+                <span class="text-sm text-(--color-text-secondary) shrink-0">
+                  {post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+              <p class="text-sm text-(--color-text-secondary) mt-1">{post.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="text-(--color-text-secondary)">No posts yet.</p>
+    )}
+  </section>
+
+  <section>
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold tracking-tight">Projects</h2>
+      <a href="/projects" class="text-sm text-(--color-text-secondary) hover:text-(--color-text) transition-colors">View all &rarr;</a>
+    </div>
+    {projects.length > 0 ? (
+      <ul class="space-y-4">
+        {projects.map(project => (
+          <li>
+            <a href={`/projects/${project.id}`} class="group block">
+              <div class="flex items-baseline justify-between gap-4">
+                <span class="font-medium group-hover:text-(--color-accent) transition-colors">{project.data.title}</span>
+                <span class="text-xs px-2 py-0.5 bg-(--color-bg-secondary) rounded-full text-(--color-text-secondary)">{project.data.status}</span>
+              </div>
+              <p class="text-sm text-(--color-text-secondary) mt-1">{project.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="text-(--color-text-secondary)">No projects yet.</p>
+    )}
+  </section>
+</BaseLayout>

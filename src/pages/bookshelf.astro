@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const books = [
+  {
+    title: 'Add your first book',
+    author: 'Author Name',
+    status: 'reading' as const,
+    thoughts: 'Edit src/pages/bookshelf.astro to add your books.',
+  },
+];
+
+type BookStatus = 'reading' | 'finished' | 'want to read';
+
+const statusLabel: Record<BookStatus, string> = {
+  reading: 'Currently reading',
+  finished: 'Finished',
+  'want to read': 'Want to read',
+};
+---
+
+<BaseLayout title="Bookshelf" description="Books I'm reading and have read.">
+  <h1 class="text-3xl font-semibold tracking-tight mb-2">Bookshelf</h1>
+  <p class="text-(--color-text-secondary) mb-10">What I'm reading, have read, and want to read.</p>
+
+  {(['reading', 'finished', 'want to read'] as BookStatus[]).map(status => {
+    const filtered = books.filter(b => b.status === status);
+    return filtered.length > 0 ? (
+      <section class="mb-10">
+        <h2 class="text-lg font-semibold mb-4">{statusLabel[status]}</h2>
+        <ul class="space-y-4">
+          {filtered.map(book => (
+            <li class="border-b border-(--color-border) pb-4">
+              <div class="flex items-baseline justify-between gap-4">
+                <span class="font-medium">{book.title}</span>
+                <span class="text-sm text-(--color-text-secondary) shrink-0">{book.author}</span>
+              </div>
+              {book.thoughts && (
+                <p class="text-sm text-(--color-text-secondary) mt-1">{book.thoughts}</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null;
+  })}
+</BaseLayout>
