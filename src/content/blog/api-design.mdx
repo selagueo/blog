@@ -1,0 +1,26 @@
+---
+title: "Principios de Diseño de APIs REST"
+description: "Guía práctica para diseñar APIs REST consistentes y fáciles de usar."
+date: 2026-01-28
+tags: ["api", "arquitectura", "programación"]
+banner: "/images/blog/api-design.svg"
+---
+
+Diseñar una buena API es más difícil de lo que parece.
+
+## Principios que sigo
+
+1. **URLs como sustantivos** — `/users`, no `/getUsers`
+2. **HTTP verbs correctos** — GET, POST, PUT, DELETE
+3. **Paginación desde el día 1**
+4. **Versionado en la URL** — `/v1/users`
+
+## Errores comunes
+
+- Devolver 200 con un error en el body
+- No documentar los errores posibles
+- Cambiar el contrato sin versionar
+
+## Herramientas
+
+OpenAPI/Swagger para documentación. Insomnia para testing.

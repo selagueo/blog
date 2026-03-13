@@ -1,0 +1,41 @@
+backend:
+  name: github
+  repo: selagueo/blog
+  branch: main
+
+media_folder: public/images/blog
+public_folder: /images/blog
+
+collections:
+  - name: blog
+    label: Blog
+    folder: src/content/blog
+    create: true
+    extension: mdx
+    format: frontmatter
+    slug: "{{slug}}"
+    fields:
+      - { label: "Título", name: title, widget: string }
+      - { label: "Descripción", name: description, widget: string }
+      - { label: "Fecha", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD" }
+      - { label: "Tags", name: tags, widget: list, default: [] }
+      - { label: "Banner", name: banner, widget: image }
+      - { label: "Borrador", name: draft, widget: boolean, default: false, required: false }
+      - { label: "Contenido", name: body, widget: markdown }
+
+  - name: projects
+    label: Proyectos
+    folder: src/content/projects
+    create: true
+    extension: mdx
+    format: frontmatter
+    slug: "{{slug}}"
+    fields:
+      - { label: "Título", name: title, widget: string }
+      - { label: "Descripción", name: description, widget: string }
+      - { label: "Fecha", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD" }
+      - { label: "Tags", name: tags, widget: list, default: [] }
+      - { label: "URL", name: url, widget: string, required: false }
+      - { label: "Repo", name: repo, widget: string, required: false }
+      - { label: "Estado", name: status, widget: select, options: ["active", "completed", "planned", "archived"], default: "active" }
+      - { label: "Contenido", name: body, widget: markdown }

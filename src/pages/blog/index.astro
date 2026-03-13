@@ -5,47 +5,182 @@ import { getCollection } from 'astro:content';
 const posts = (await getCollection('blog'))
   .filter(p => !p.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Serialize posts for the client
+const serializedPosts = posts.map(post => ({
+  id: post.id,
+  title: post.data.title,
+  description: post.data.description,
+  date: post.data.date.toISOString(),
+  dateFormatted: post.data.date.toLocaleDateString('es-AR', { month: 'short', day: 'numeric', year: 'numeric' }),
+  tags: post.data.tags,
+  banner: post.data.banner,
+}));
 ---
 
 <BaseLayout title="Blog" description="Ideas, pensamientos y cosas que voy aprendiendo.">
-  <h1 class="text-3xl font-semibold tracking-tight mb-2">Blog</h1>
-  <p class="text-(--color-text-secondary) mb-10">Ideas, pensamientos y cosas que voy aprendiendo.</p>
+  <div class="pt-12 pb-16">
+    <h1 class="text-3xl font-semibold tracking-tight mb-2">Blog</h1>
+    <p class="text-(--color-text-secondary) mb-8">Ideas, pensamientos y cosas que voy aprendiendo.</p>
 
-  {posts.length > 0 ? (
-    <ul class="flex flex-col gap-6">
-      {posts.map(post => (
-        <li>
-          <a href={`/blog/${post.id}`} class="group block rounded-xl border border-(--color-border) bg-(--color-bg-secondary) overflow-hidden transition-all hover:border-(--color-accent)/40 hover:shadow-lg">
-            <div class="flex flex-col sm:flex-row">
-              <div class="sm:w-56 sm:h-auto h-48 shrink-0 overflow-hidden">
-                <img
-                  src={post.data.banner}
-                  alt={post.data.title}
-                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <div class="flex-1 p-5 flex flex-col justify-center">
-                <div class="flex items-baseline justify-between gap-4 mb-1">
-                  <h2 class="font-semibold text-lg group-hover:text-(--color-accent) transition-colors">{post.data.title}</h2>
-                  <span class="text-sm text-(--color-text-secondary) shrink-0">
-                    {post.data.date.toLocaleDateString('es-AR', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
-                </div>
-                <p class="text-sm text-(--color-text-secondary) mb-3">{post.data.description}</p>
-                {post.data.tags.length > 0 && (
-                  <div class="flex gap-2">
-                    {post.data.tags.map(tag => (
-                      <span class="text-xs px-2 py-0.5 bg-(--color-bg) rounded-full text-(--color-text-secondary)">{tag}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </a>
-        </li>
-      ))}
+    <!-- Filters bar -->
+    <div class="flex flex-col sm:flex-row gap-3 mb-8">
+      <!-- Search -->
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--color-text-secondary) pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          id="blog-search"
+          type="text"
+          placeholder="Buscar posts..."
+          class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-sm text-(--color-text) placeholder:text-(--color-text-secondary) focus:outline-none focus:border-(--color-accent) transition-colors"
+        />
+      </div>
+      <!-- Sort -->
+      <div class="relative">
+        <select
+          id="blog-sort"
+          class="appearance-none pl-4 pr-10 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-sm text-(--color-text) focus:outline-none focus:border-(--color-accent) transition-colors cursor-pointer"
+        >
+          <option value="newest">Más recientes</option>
+          <option value="oldest">Más antiguos</option>
+        </select>
+        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--color-text-secondary) pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Posts list -->
+    <ul id="blog-list" class="flex flex-col gap-6">
     </ul>
-  ) : (
-    <p class="text-(--color-text-secondary)">No hay posts todavía. ¡Volvé pronto!</p>
-  )}
+
+    <!-- Empty state -->
+    <p id="blog-empty" class="hidden text-(--color-text-secondary) text-center py-12">
+      No se encontraron posts.
+    </p>
+
+    <!-- Load more -->
+    <div id="blog-load-more" class="hidden mt-10 text-center">
+      <button
+        id="load-more-btn"
+        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-(--color-border) text-sm text-(--color-text-secondary) hover:border-(--color-accent) hover:text-(--color-accent) transition-colors cursor-pointer"
+      >
+        Cargar más
+        <span id="load-more-count" class="text-xs opacity-60"></span>
+      </button>
+    </div>
+
+    <!-- Post count -->
+    <p id="blog-count" class="mt-6 text-center text-xs text-(--color-text-secondary) opacity-60"></p>
+  </div>
+
+  <script is:inline define:vars={{ serializedPosts }}>
+    (function() {
+      var POSTS = serializedPosts;
+      var PER_PAGE = 10;
+      var currentPage = 1;
+      var filtered = POSTS;
+
+      var listEl = document.getElementById('blog-list');
+      var emptyEl = document.getElementById('blog-empty');
+      var loadMoreEl = document.getElementById('blog-load-more');
+      var loadMoreBtn = document.getElementById('load-more-btn');
+      var loadMoreCount = document.getElementById('load-more-count');
+      var countEl = document.getElementById('blog-count');
+      var searchInput = document.getElementById('blog-search');
+      var sortSelect = document.getElementById('blog-sort');
+
+      function renderCard(post) {
+        return '<li>' +
+          '<a href="/blog/' + post.id + '" class="group block rounded-xl border border-(--color-border) bg-(--color-bg-secondary) overflow-hidden transition-all hover:border-(--color-accent)/40 hover:shadow-lg">' +
+            '<div class="flex flex-col sm:flex-row">' +
+              '<div class="sm:w-56 sm:h-auto h-48 shrink-0 overflow-hidden">' +
+                '<img src="' + post.banner + '" alt="' + post.title + '" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />' +
+              '</div>' +
+              '<div class="flex-1 p-5 flex flex-col justify-center">' +
+                '<div class="flex items-baseline justify-between gap-4 mb-1">' +
+                  '<h2 class="font-semibold text-lg group-hover:text-(--color-accent) transition-colors">' + post.title + '</h2>' +
+                  '<span class="text-sm text-(--color-text-secondary) shrink-0">' + post.dateFormatted + '</span>' +
+                '</div>' +
+                '<p class="text-sm text-(--color-text-secondary) mb-3">' + post.description + '</p>' +
+                (post.tags.length > 0 ?
+                  '<div class="flex flex-wrap gap-2">' +
+                    post.tags.map(function(tag) {
+                      return '<span class="text-xs px-2 py-0.5 bg-(--color-bg) rounded-full text-(--color-text-secondary)">' + tag + '</span>';
+                    }).join('') +
+                  '</div>'
+                : '') +
+              '</div>' +
+            '</div>' +
+          '</a>' +
+        '</li>';
+      }
+
+      function render() {
+        var visible = filtered.slice(0, currentPage * PER_PAGE);
+        var remaining = filtered.length - visible.length;
+
+        if (visible.length === 0) {
+          listEl.innerHTML = '';
+          emptyEl.classList.remove('hidden');
+          loadMoreEl.classList.add('hidden');
+          countEl.textContent = '';
+          return;
+        }
+
+        emptyEl.classList.add('hidden');
+        listEl.innerHTML = visible.map(renderCard).join('');
+
+        if (remaining > 0) {
+          loadMoreEl.classList.remove('hidden');
+          loadMoreCount.textContent = '(' + remaining + ' más)';
+        } else {
+          loadMoreEl.classList.add('hidden');
+        }
+
+        countEl.textContent = 'Mostrando ' + visible.length + ' de ' + filtered.length + ' posts';
+      }
+
+      function applyFilters() {
+        var query = searchInput.value.toLowerCase().trim();
+        var sortOrder = sortSelect.value;
+        currentPage = 1;
+
+        filtered = POSTS.filter(function(post) {
+          if (!query) return true;
+          return post.title.toLowerCase().indexOf(query) !== -1 ||
+                 post.description.toLowerCase().indexOf(query) !== -1 ||
+                 post.tags.some(function(tag) { return tag.toLowerCase().indexOf(query) !== -1; });
+        });
+
+        filtered.sort(function(a, b) {
+          var da = new Date(a.date).valueOf();
+          var db = new Date(b.date).valueOf();
+          return sortOrder === 'newest' ? db - da : da - db;
+        });
+
+        render();
+      }
+
+      searchInput.addEventListener('input', applyFilters);
+      sortSelect.addEventListener('change', applyFilters);
+
+      loadMoreBtn.addEventListener('click', function() {
+        currentPage++;
+        render();
+        // Scroll to first new item
+        var items = listEl.querySelectorAll('li');
+        var firstNew = items[(currentPage - 1) * PER_PAGE];
+        if (firstNew) {
+          firstNew.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+
+      // Initial render
+      applyFilters();
+    })();
+  </script>
 </BaseLayout>

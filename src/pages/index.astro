@@ -14,7 +14,7 @@ const projects = (await getCollection('projects'))
 
 <BaseLayout title="Inicio">
   <!-- Hero + LCD Player -->
-  <section class="mb-20 pt-8 md:pt-16">
+  <section class="min-h-[calc(100vh-88px)] flex flex-col justify-center mb-20">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-10">
       <!-- Left: Hero text -->
       <div class="flex-1">
@@ -22,7 +22,7 @@ const projects = (await getCollection('projects'))
           <span class="hero-name">José Lagos Guevara</span>
         </h1>
         <p class="text-lg md:text-xl text-(--color-text-secondary) leading-relaxed max-w-lg hero-fade hero-fade-delay-2">
-          Emprendedor, golfista, ingeniero, desarrollador, product designer y artista <span class="italic">(entre otras mentiras)</span>, este es mi portfolio y sandbox personal.
+          Emprendedor, golfista, desarrollador, product designer, artista <span class="italic">(entre otras mentiras)</span>... Este es mi portfolio y sandbox personal.
         </p>
         <div class="flex items-center gap-5 mt-8 hero-fade hero-fade-delay-3">
           <a href="/about" class="inline-flex items-center gap-2 px-5 py-2.5 bg-(--color-text) text-(--color-bg) rounded-full text-sm font-medium hover:opacity-80 transition-opacity">

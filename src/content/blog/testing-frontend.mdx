@@ -1,0 +1,27 @@
+---
+title: "Testing en Frontend: Mi Estrategia"
+description: "Cómo organizo los tests en aplicaciones frontend modernas."
+date: 2026-01-12
+tags: ["testing", "frontend", "programación"]
+banner: "/images/blog/testing-frontend.svg"
+---
+
+Testing en frontend siempre fue un tema polémico. Acá va mi enfoque.
+
+## La pirámide (invertida)
+
+En frontend, la pirámide clásica de testing no aplica del todo.
+
+1. **Integration tests** — la mayoría deberían ser estos
+2. **E2E tests** — para los flujos críticos
+3. **Unit tests** — para lógica pura (utils, hooks)
+
+## Herramientas
+
+- Vitest para unit/integration
+- Playwright para E2E
+- Testing Library siempre
+
+## La regla de oro
+
+Testeá comportamiento, no implementación.

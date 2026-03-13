@@ -10,6 +10,7 @@ const links = [
 const currentPath = Astro.url.pathname;
 ---
 
+<header class="sticky top-0 z-50 bg-(--color-bg)/80 backdrop-blur-md">
 <nav class="w-full max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
   <a href="/" class="text-lg font-semibold tracking-tight hover:opacity-70 transition-opacity">
     selagueo
@@ -53,7 +54,7 @@ const currentPath = Astro.url.pathname;
 </nav>
 
 <!-- Mobile menu -->
-<div id="mobile-menu" class="hidden md:hidden border-b border-(--color-border)">
+<div id="mobile-menu" class="hidden md:hidden border-b border-(--color-border) bg-(--color-bg)/80 backdrop-blur-md">
   <ul class="max-w-5xl mx-auto px-6 pb-6 flex flex-col gap-4 text-base">
     {links.map(link => (
       <li>
@@ -72,6 +73,7 @@ const currentPath = Astro.url.pathname;
     ))}
   </ul>
 </div>
+</header>
 
 <script is:inline>
   (function() {
