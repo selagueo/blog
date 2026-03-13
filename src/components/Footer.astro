@@ -2,12 +2,49 @@
 const year = new Date().getFullYear();
 ---
 
-<footer class="w-full max-w-3xl mx-auto px-6 py-8 border-t border-(--color-border)">
-  <div class="flex items-center justify-between text-sm text-(--color-text-secondary)">
-    <span>&copy; {year} José Lagos</span>
-    <div class="flex gap-4">
-      <a href="https://instagram.com/selagueo" target="_blank" rel="noopener" class="hover:text-(--color-text) transition-colors">Instagram</a>
-      <a href="https://github.com/selagueo" target="_blank" rel="noopener" class="hover:text-(--color-text) transition-colors">GitHub</a>
+<footer class="w-full max-w-5xl mx-auto px-6 py-8 border-t border-(--color-border)">
+  <div class="flex flex-col gap-4 text-sm text-(--color-text-secondary)">
+    <!-- Top row: controls + social -->
+    <div class="flex items-center justify-between">
+      <button
+        id="theme-toggle-footer"
+        aria-label="Cambiar tema"
+        class="hover:text-(--color-text) transition-colors cursor-pointer text-base"
+      >
+        <span id="ft-icon-light" class="hidden">☀</span>
+        <span id="ft-icon-dark" class="hidden">☾</span>
+      </button>
+      <div class="flex gap-4">
+        <a href="https://instagram.com/selagueo" target="_blank" rel="noopener" class="hover:text-(--color-text) transition-colors">Instagram</a>
+        <a href="https://github.com/selagueo" target="_blank" rel="noopener" class="hover:text-(--color-text) transition-colors">GitHub</a>
+      </div>
+    </div>
+    <!-- Bottom row: copyright + powered by -->
+    <div class="flex items-center justify-between">
+      <span>&copy; {year} José Lagos</span>
+      <span>Powered by <a href="https://lajo.ar" target="_blank" rel="noopener" class="hover:text-(--color-text) transition-colors underline underline-offset-2">lajo.ar</a></span>
     </div>
   </div>
 </footer>
+
+<script is:inline>
+  (function() {
+    var toggle = document.getElementById('theme-toggle-footer');
+    var iconLight = document.getElementById('ft-icon-light');
+    var iconDark = document.getElementById('ft-icon-dark');
+
+    function updateIcon() {
+      var isDark = document.documentElement.classList.contains('dark');
+      iconLight.classList.toggle('hidden', !isDark);
+      iconDark.classList.toggle('hidden', isDark);
+    }
+
+    updateIcon();
+
+    toggle.addEventListener('click', function() {
+      var isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateIcon();
+    });
+  })();
+</script>

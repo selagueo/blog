@@ -22,10 +22,10 @@ const { Content } = await render(project);
 >
   <div class="flex gap-3 mb-8 text-sm">
     {project.data.url && (
-      <a href={project.data.url} target="_blank" rel="noopener" class="text-(--color-accent) hover:underline">Live site &rarr;</a>
+      <a href={project.data.url} target="_blank" rel="noopener" class="text-(--color-accent) hover:underline">Sitio en vivo &rarr;</a>
     )}
     {project.data.repo && (
-      <a href={project.data.repo} target="_blank" rel="noopener" class="text-(--color-text-secondary) hover:text-(--color-text) transition-colors">Source code &rarr;</a>
+      <a href={project.data.repo} target="_blank" rel="noopener" class="text-(--color-text-secondary) hover:text-(--color-text) transition-colors">Código fuente &rarr;</a>
     )}
   </div>
   <Content />

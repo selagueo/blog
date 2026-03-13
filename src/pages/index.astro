@@ -12,48 +12,265 @@ const projects = (await getCollection('projects'))
   .slice(0, 3);
 ---
 
-<BaseLayout title="Home">
-  <section class="mb-16">
-    <h1 class="text-3xl font-semibold tracking-tight mb-4">José Lagos</h1>
-    <p class="text-(--color-text-secondary) text-lg leading-relaxed max-w-xl">
-      Developer, maker, and occasional writer. Building things, reading books, and listening to music. Based in the internet.
-    </p>
-    <div class="flex gap-4 mt-6 text-sm">
-      <a href="/about" class="text-(--color-accent) hover:underline">More about me &rarr;</a>
-      <a href="https://instagram.com/selagueo" target="_blank" rel="noopener" class="text-(--color-text-secondary) hover:text-(--color-text) transition-colors">@selagueo</a>
+<BaseLayout title="Inicio">
+  <!-- Hero + LCD Player -->
+  <section class="mb-20 pt-8 md:pt-16">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-10">
+      <!-- Left: Hero text -->
+      <div class="flex-1">
+        <h1 class="text-6xl md:text-8xl font-bold tracking-tight leading-[1.05] mb-6 hero-fade hero-fade-delay-1">
+          <span class="hero-name">José Lagos Guevara</span>
+        </h1>
+        <p class="text-lg md:text-xl text-(--color-text-secondary) leading-relaxed max-w-lg hero-fade hero-fade-delay-2">
+          Emprendedor, golfista, ingeniero, desarrollador, product designer y artista <span class="italic">(entre otras mentiras)</span>, este es mi portfolio y sandbox personal.
+        </p>
+        <div class="flex items-center gap-5 mt-8 hero-fade hero-fade-delay-3">
+          <a href="/about" class="inline-flex items-center gap-2 px-5 py-2.5 bg-(--color-text) text-(--color-bg) rounded-full text-sm font-medium hover:opacity-80 transition-opacity">
+            Sobre mí
+          </a>
+        </div>
+      </div>
+
+      <!-- Right (desktop) / Bottom (mobile): Spotify Player -->
+      <div class="hero-fade hero-fade-delay-3 flex justify-center md:justify-end shrink-0">
+        <a id="sp-link" href="#" target="_blank" rel="noopener" class="block no-underline">
+          <div id="sp-card" class="sp-card sp-idle">
+            <!-- Header -->
+            <div class="sp-header">
+              <span id="sp-status-text" class="sp-header-text">Ahora estoy escuchando...</span>
+              <svg class="sp-logo" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
+            </div>
+            <!-- Body -->
+            <div class="sp-body">
+              <div id="sp-art-wrap" class="sp-art-wrap">
+                <div id="sp-art-placeholder" class="sp-art-placeholder">♪</div>
+                <img id="sp-art" class="sp-art hidden" alt="" />
+              </div>
+              <div class="sp-info">
+                <div id="sp-title" class="sp-title">- - -</div>
+                <div id="sp-artist" class="sp-artist">Loading</div>
+              </div>
+            </div>
+            <!-- Progress -->
+            <div class="sp-progress">
+              <span id="sp-time-current" class="sp-time">0:00</span>
+              <div class="sp-bar-bg">
+                <div id="sp-bar-fill" class="sp-bar-fill" style="width:0%"></div>
+              </div>
+              <span id="sp-time-total" class="sp-time">0:00</span>
+            </div>
+          </div>
+        </a>
+      </div>
     </div>
   </section>
 
   <section class="mb-16">
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-semibold tracking-tight">Recent posts</h2>
-      <a href="/blog" class="text-sm text-(--color-text-secondary) hover:text-(--color-text) transition-colors">View all &rarr;</a>
+      <h2 class="text-xl font-semibold tracking-tight">Últimos posts</h2>
+      <a href="/blog" class="text-sm text-(--color-text-secondary) hover:text-(--color-text) transition-colors">Ver todos &rarr;</a>
     </div>
     {posts.length > 0 ? (
-      <ul class="space-y-4">
+      <ul class="flex flex-col gap-6">
         {posts.map(post => (
           <li>
-            <a href={`/blog/${post.id}`} class="group block">
-              <div class="flex items-baseline justify-between gap-4">
-                <span class="font-medium group-hover:text-(--color-accent) transition-colors">{post.data.title}</span>
-                <span class="text-sm text-(--color-text-secondary) shrink-0">
-                  {post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </span>
+            <a href={`/blog/${post.id}`} class="group block rounded-xl border border-(--color-border) bg-(--color-bg-secondary) overflow-hidden transition-all hover:border-(--color-accent)/40 hover:shadow-lg">
+              <div class="flex flex-col sm:flex-row">
+                <div class="sm:w-56 sm:h-auto h-48 shrink-0 overflow-hidden">
+                  <img
+                    src={post.data.banner}
+                    alt={post.data.title}
+                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div class="flex-1 p-5 flex flex-col justify-center">
+                  <div class="flex items-baseline justify-between gap-4 mb-1">
+                    <h3 class="font-semibold text-lg group-hover:text-(--color-accent) transition-colors">{post.data.title}</h3>
+                    <span class="text-sm text-(--color-text-secondary) shrink-0">
+                      {post.data.date.toLocaleDateString('es-AR', { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                  <p class="text-sm text-(--color-text-secondary) mb-3">{post.data.description}</p>
+                  {post.data.tags.length > 0 && (
+                    <div class="flex gap-2">
+                      {post.data.tags.map(tag => (
+                        <span class="text-xs px-2 py-0.5 bg-(--color-bg) rounded-full text-(--color-text-secondary)">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <p class="text-sm text-(--color-text-secondary) mt-1">{post.data.description}</p>
             </a>
           </li>
         ))}
       </ul>
     ) : (
-      <p class="text-(--color-text-secondary)">No posts yet.</p>
+      <p class="text-(--color-text-secondary)">No hay posts todavía.</p>
     )}
   </section>
 
+  <script is:inline>
+    (function() {
+      var state = { progressMs: 0, durationMs: 0, isPlaying: false, fetchedAt: 0 };
+      var tickId = null;
+
+      function fmt(ms) {
+        var s = Math.floor(ms / 1000);
+        var m = Math.floor(s / 60);
+        s = s % 60;
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      function tick() {
+        if (!state.isPlaying || !state.durationMs) return;
+        var elapsed = Date.now() - state.fetchedAt;
+        var current = Math.min(state.progressMs + elapsed, state.durationMs);
+        var pct = (current / state.durationMs) * 100;
+
+        var cur = document.getElementById('sp-time-current');
+        var fill = document.getElementById('sp-bar-fill');
+        if (cur) cur.textContent = fmt(current);
+        if (fill) fill.style.width = pct + '%';
+
+        // Song ended? Refetch
+        if (current >= state.durationMs) {
+          clearInterval(tickId);
+          fetchNowPlaying();
+        }
+      }
+
+      var scrollTimers = {};
+      function maybeScroll(el) {
+        if (!el) return;
+        var id = el.id;
+        // Clear any previous scroll timer for this element
+        if (scrollTimers[id]) { clearInterval(scrollTimers[id]); delete scrollTimers[id]; }
+
+        if (el.scrollWidth > el.clientWidth) {
+          var text = el.textContent;
+          var span = document.createElement('span');
+          span.style.cssText = 'display:inline-block;white-space:nowrap';
+          span.textContent = text;
+          el.innerHTML = '';
+          el.appendChild(span);
+          el.classList.add('sp-scroll');
+
+          var overflow = span.scrollWidth - el.clientWidth;
+          var step = 8; // pixels per tick
+          var interval = 250; // ms between ticks
+          var pauseTicks = 12; // pause ~3s at each end
+          var pos = 0;
+          var dir = -1; // -1 = scrolling left, 1 = scrolling right
+          var paused = pauseTicks; // start with a pause
+
+          scrollTimers[id] = setInterval(function() {
+            if (paused > 0) { paused--; return; }
+            pos += dir * step;
+            if (pos <= -overflow) {
+              pos = -overflow;
+              dir = 1;
+              paused = pauseTicks;
+            } else if (pos >= 0) {
+              pos = 0;
+              dir = -1;
+              paused = pauseTicks;
+            }
+            span.style.transform = 'translateX(' + pos + 'px)';
+          }, interval);
+        } else {
+          el.classList.remove('sp-scroll');
+        }
+      }
+
+      async function fetchNowPlaying() {
+        try {
+          var res = await fetch('/api/spotify/now-playing');
+          var data = await res.json();
+          var card = document.getElementById('sp-card');
+          var link = document.getElementById('sp-link');
+          var title = document.getElementById('sp-title');
+          var artist = document.getElementById('sp-artist');
+          var art = document.getElementById('sp-art');
+          var artPlaceholder = document.getElementById('sp-art-placeholder');
+          var timeCur = document.getElementById('sp-time-current');
+          var timeTotal = document.getElementById('sp-time-total');
+          var barFill = document.getElementById('sp-bar-fill');
+          var statusText = document.getElementById('sp-status-text');
+
+          if (!card) return;
+
+          if (tickId) { clearInterval(tickId); tickId = null; }
+
+          if (!data.title) {
+            card.className = 'sp-card sp-idle';
+            if (title) { title.textContent = '- - -'; title.classList.remove('sp-scroll'); }
+            if (artist) { artist.textContent = 'Offline'; artist.classList.remove('sp-scroll'); }
+            if (art) art.classList.add('hidden');
+            if (artPlaceholder) artPlaceholder.classList.remove('hidden');
+            if (link) link.removeAttribute('href');
+            if (statusText) statusText.textContent = 'Spotify offline';
+            if (timeCur) timeCur.textContent = '0:00';
+            if (timeTotal) timeTotal.textContent = '0:00';
+            if (barFill) barFill.style.width = '0%';
+            return;
+          }
+
+          if (link) link.href = data.songUrl;
+          var isLive = data.isPlaying;
+          card.className = 'sp-card ' + (isLive ? 'sp-live' : 'sp-idle');
+          if (statusText) statusText.textContent = isLive ? 'Ahora estoy escuchando...' : 'Lo último que escuché...';
+
+          // Album art
+          if (data.albumArt && art) {
+            art.onload = function() {
+              art.classList.remove('hidden');
+              if (artPlaceholder) artPlaceholder.classList.add('hidden');
+            };
+            art.src = data.albumArt;
+          } else {
+            if (art) art.classList.add('hidden');
+            if (artPlaceholder) artPlaceholder.classList.remove('hidden');
+          }
+
+          // Title & artist (DSEG font) — widen spaces for legibility
+          var wideSpace = '\u2002\u2002';
+          if (title) { title.textContent = data.title.replace(/ /g, wideSpace); maybeScroll(title); }
+          if (artist) { artist.textContent = data.artist.replace(/ /g, wideSpace); maybeScroll(artist); }
+
+          // Progress
+          state.progressMs = data.progressMs || 0;
+          state.durationMs = data.durationMs || 0;
+          state.isPlaying = isLive;
+          state.fetchedAt = Date.now();
+
+          if (timeTotal) timeTotal.textContent = fmt(state.durationMs);
+          if (timeCur) timeCur.textContent = fmt(state.progressMs);
+          if (barFill) barFill.style.width = (state.durationMs ? (state.progressMs / state.durationMs) * 100 : 0) + '%';
+
+          // Tick every second if playing
+          if (isLive) {
+            tickId = setInterval(tick, 1000);
+          }
+        } catch (e) {
+          var c = document.getElementById('sp-card');
+          if (c) c.className = 'sp-card sp-idle';
+          var t = document.getElementById('sp-title');
+          if (t) { t.textContent = '- - -'; t.classList.remove('sp-scroll'); }
+          var st = document.getElementById('sp-status-text');
+          if (st) st.textContent = 'Spotify offline';
+        }
+      }
+      fetchNowPlaying();
+      setInterval(fetchNowPlaying, 15000);
+    })();
+  </script>
+
   <section>
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-semibold tracking-tight">Projects</h2>
-      <a href="/projects" class="text-sm text-(--color-text-secondary) hover:text-(--color-text) transition-colors">View all &rarr;</a>
+      <h2 class="text-xl font-semibold tracking-tight">Proyectos</h2>
+      <a href="/projects" class="text-sm text-(--color-text-secondary) hover:text-(--color-text) transition-colors">Ver todos &rarr;</a>
     </div>
     {projects.length > 0 ? (
       <ul class="space-y-4">
@@ -70,7 +287,7 @@ const projects = (await getCollection('projects'))
         ))}
       </ul>
     ) : (
-      <p class="text-(--color-text-secondary)">No projects yet.</p>
+      <p class="text-(--color-text-secondary)">No hay proyectos todavía.</p>
     )}
   </section>
 </BaseLayout>

@@ -1,47 +1,108 @@
 ---
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getBooks, type Book } from '../lib/goodreads';
 
-const books = [
-  {
-    title: 'Add your first book',
-    author: 'Author Name',
-    status: 'reading' as const,
-    thoughts: 'Edit src/pages/bookshelf.astro to add your books.',
-  },
+const { reading, read, toRead } = await getBooks();
+
+function renderStars(rating: number): string {
+  if (rating === 0) return '';
+  return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+}
+
+const INITIAL_COUNT = 4;
+
+const shelves: { id: string; label: string; books: Book[] }[] = [
+  { id: 'reading', label: 'Leyendo ahora', books: reading },
+  { id: 'read', label: 'Leídos', books: read },
+  { id: 'toread', label: 'Quiero leer', books: toRead },
 ];
-
-type BookStatus = 'reading' | 'finished' | 'want to read';
-
-const statusLabel: Record<BookStatus, string> = {
-  reading: 'Currently reading',
-  finished: 'Finished',
-  'want to read': 'Want to read',
-};
 ---
 
-<BaseLayout title="Bookshelf" description="Books I'm reading and have read.">
-  <h1 class="text-3xl font-semibold tracking-tight mb-2">Bookshelf</h1>
-  <p class="text-(--color-text-secondary) mb-10">What I'm reading, have read, and want to read.</p>
+<BaseLayout title="Lecturas" description="Libros que estoy leyendo y que leí.">
+  <h1 class="text-3xl font-semibold tracking-tight mb-2">Lecturas</h1>
+  <p class="text-(--color-text-secondary) mb-2">Lo que estoy leyendo, lo que leí y lo que quiero leer.</p>
+  <p class="text-xs text-(--color-text-secondary) mb-10">
+    Sincronizado con <a href="https://www.goodreads.com/user/show/198954569-jos-lagos" target="_blank" rel="noopener" class="text-(--color-accent) hover:underline">mi Goodreads</a>
+  </p>
 
-  {(['reading', 'finished', 'want to read'] as BookStatus[]).map(status => {
-    const filtered = books.filter(b => b.status === status);
-    return filtered.length > 0 ? (
-      <section class="mb-10">
-        <h2 class="text-lg font-semibold mb-4">{statusLabel[status]}</h2>
-        <ul class="space-y-4">
-          {filtered.map(book => (
-            <li class="border-b border-(--color-border) pb-4">
-              <div class="flex items-baseline justify-between gap-4">
-                <span class="font-medium">{book.title}</span>
-                <span class="text-sm text-(--color-text-secondary) shrink-0">{book.author}</span>
-              </div>
-              {book.thoughts && (
-                <p class="text-sm text-(--color-text-secondary) mt-1">{book.thoughts}</p>
+  {shelves.map(shelf => shelf.books.length > 0 && (
+    <section class="mb-12">
+      <div class="flex items-baseline justify-between mb-6">
+        <h2 class="text-lg font-semibold">{shelf.label}</h2>
+        <span class="text-xs text-(--color-text-secondary)">{shelf.books.length} libros</span>
+      </div>
+      <ul class="grid grid-cols-1 gap-6" id={`shelf-${shelf.id}`}>
+        {shelf.books.map((book, i) => (
+          <li class:list={[i >= INITIAL_COUNT && 'hidden', 'shelf-item']}>
+            <div class="flex gap-4 items-start">
+              {book.cover && (
+                <a href={book.link} target="_blank" rel="noopener" class="shrink-0">
+                  <img
+                    src={book.cover}
+                    alt={book.title}
+                    class="w-16 h-24 object-cover rounded shadow-sm hover:opacity-80 transition-opacity"
+                    loading="lazy"
+                  />
+                </a>
               )}
-            </li>
-          ))}
-        </ul>
-      </section>
-    ) : null;
-  })}
+              <div class="min-w-0">
+                <a href={book.link} target="_blank" rel="noopener" class="font-medium hover:text-(--color-accent) transition-colors block">{book.title}</a>
+                <span class="text-sm text-(--color-text-secondary) block mt-0.5">{book.author}</span>
+                <div class="flex items-center gap-3 mt-1 text-xs text-(--color-text-secondary)">
+                  {book.rating > 0 && (
+                    <span class="text-amber-500">{renderStars(book.rating)}</span>
+                  )}
+                  {book.pages > 0 && <span>{book.pages} págs.</span>}
+                </div>
+                {book.review && (
+                  <a
+                    href={book.link}
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-block mt-2 text-xs text-(--color-accent) hover:underline"
+                  >
+                    Leer mi reseña &rarr;
+                  </a>
+                )}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+      {shelf.books.length > INITIAL_COUNT && (
+        <button
+          class="mt-4 text-sm text-(--color-accent) hover:underline cursor-pointer shelf-toggle"
+          data-shelf={shelf.id}
+          data-total={shelf.books.length}
+        >
+          Ver más ({shelf.books.length - INITIAL_COUNT} restantes)
+        </button>
+      )}
+    </section>
+  ))}
 </BaseLayout>
+
+<script is:inline>
+  document.querySelectorAll('.shelf-toggle').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var shelfId = btn.getAttribute('data-shelf');
+      var shelf = document.getElementById('shelf-' + shelfId);
+      var items = shelf.querySelectorAll('.shelf-item.hidden');
+      if (items.length > 0) {
+        items.forEach(function(item) { item.classList.remove('hidden'); });
+        btn.textContent = 'Ver menos';
+        btn.dataset.expanded = 'true';
+      } else {
+        var allItems = shelf.querySelectorAll('.shelf-item');
+        allItems.forEach(function(item, i) {
+          if (i >= 4) item.classList.add('hidden');
+        });
+        var total = Number(btn.getAttribute('data-total'));
+        btn.textContent = 'Ver más (' + (total - 4) + ' restantes)';
+        btn.dataset.expanded = 'false';
+      }
+    });
+  });
+</script>

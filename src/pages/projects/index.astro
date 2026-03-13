@@ -6,9 +6,9 @@ const projects = (await getCollection('projects'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<BaseLayout title="Projects" description="Things I'm building and experimenting with.">
-  <h1 class="text-3xl font-semibold tracking-tight mb-2">Projects</h1>
-  <p class="text-(--color-text-secondary) mb-10">Things I'm building and experimenting with.</p>
+<BaseLayout title="Proyectos" description="Cosas que estoy construyendo y experimentando.">
+  <h1 class="text-3xl font-semibold tracking-tight mb-2">Proyectos</h1>
+  <p class="text-(--color-text-secondary) mb-10">Cosas que estoy construyendo y experimentando.</p>
 
   {projects.length > 0 ? (
     <ul class="space-y-6">
@@ -30,6 +30,6 @@ const projects = (await getCollection('projects'))
       ))}
     </ul>
   ) : (
-    <p class="text-(--color-text-secondary)">No projects yet.</p>
+    <p class="text-(--color-text-secondary)">No hay proyectos todavía.</p>
   )}
 </BaseLayout>

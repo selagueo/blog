@@ -1,21 +1,22 @@
 ---
 const links = [
-  { href: '/', label: 'Home' },
+  { href: '/', label: 'Inicio' },
   { href: '/blog', label: 'Blog' },
-  { href: '/projects', label: 'Projects' },
-  { href: '/bookshelf', label: 'Bookshelf' },
-  { href: '/music', label: 'Music' },
-  { href: '/about', label: 'About' },
+  { href: '/projects', label: 'Proyectos' },
+  { href: '/bookshelf', label: 'Lecturas' },
+  { href: '/about', label: 'Sobre mí' },
 ];
 
 const currentPath = Astro.url.pathname;
 ---
 
-<nav class="w-full max-w-3xl mx-auto px-6 py-6 flex items-center justify-between">
+<nav class="w-full max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
   <a href="/" class="text-lg font-semibold tracking-tight hover:opacity-70 transition-opacity">
     selagueo
   </a>
-  <ul class="flex gap-6 text-sm">
+
+  <!-- Desktop nav -->
+  <ul class="hidden md:flex gap-6 text-sm">
     {links.map(link => (
       <li>
         <a
@@ -32,4 +33,57 @@ const currentPath = Astro.url.pathname;
       </li>
     ))}
   </ul>
+
+  <!-- Mobile hamburger -->
+  <button
+    id="menu-toggle"
+    aria-label="Abrir menú"
+    class="text-(--color-text) cursor-pointer md:hidden"
+  >
+    <svg id="menu-icon-open" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <line x1="3" y1="5" x2="17" y2="5" />
+      <line x1="3" y1="10" x2="17" y2="10" />
+      <line x1="3" y1="15" x2="17" y2="15" />
+    </svg>
+    <svg id="menu-icon-close" class="hidden" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <line x1="4" y1="4" x2="16" y2="16" />
+      <line x1="16" y1="4" x2="4" y2="16" />
+    </svg>
+  </button>
 </nav>
+
+<!-- Mobile menu -->
+<div id="mobile-menu" class="hidden md:hidden border-b border-(--color-border)">
+  <ul class="max-w-5xl mx-auto px-6 pb-6 flex flex-col gap-4 text-base">
+    {links.map(link => (
+      <li>
+        <a
+          href={link.href}
+          class:list={[
+            'block py-1 transition-opacity hover:opacity-70',
+            currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
+              ? 'font-medium text-(--color-text)'
+              : 'text-(--color-text-secondary)',
+          ]}
+        >
+          {link.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<script is:inline>
+  (function() {
+    var menuToggle = document.getElementById('menu-toggle');
+    var mobileMenu = document.getElementById('mobile-menu');
+    var iconOpen = document.getElementById('menu-icon-open');
+    var iconClose = document.getElementById('menu-icon-close');
+
+    menuToggle.addEventListener('click', function() {
+      var isHidden = mobileMenu.classList.toggle('hidden');
+      iconOpen.classList.toggle('hidden', !isHidden);
+      iconClose.classList.toggle('hidden', isHidden);
+    });
+  })();
+</script>
