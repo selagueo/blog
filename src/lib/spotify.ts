@@ -7,6 +7,12 @@ const TOKEN_URL = 'https://accounts.spotify.com/api/token';
 const NOW_PLAYING_URL = 'https://api.spotify.com/v1/me/player/currently-playing';
 const RECENTLY_PLAYED_URL = 'https://api.spotify.com/v1/me/player/recently-played?limit=1';
 
+// Cache to avoid 429 rate limits
+let recentCache: { data: SpotifyTrack | null; timestamp: number } = { data: null, timestamp: 0 };
+const RECENT_CACHE_TTL = 120_000; // 2 minutes
+
+let tokenCache: { token: string; expiresAt: number } = { token: '', expiresAt: 0 };
+
 export interface SpotifyTrack {
   isPlaying: boolean;
   title: string;
@@ -16,9 +22,16 @@ export interface SpotifyTrack {
   songUrl: string;
   progressMs: number;
   durationMs: number;
+  contextName?: string;
+  contextUrl?: string;
+  contextType?: string;
 }
 
 async function getAccessToken(): Promise<string> {
+  if (tokenCache.token && Date.now() < tokenCache.expiresAt) {
+    return tokenCache.token;
+  }
+
   const res = await fetch(TOKEN_URL, {
     method: 'POST',
     headers: {
@@ -32,6 +45,7 @@ async function getAccessToken(): Promise<string> {
   });
 
   const data = await res.json();
+  tokenCache = { token: data.access_token, expiresAt: Date.now() + (data.expires_in - 60) * 1000 };
   return data.access_token;
 }
 
@@ -52,12 +66,11 @@ export async function getNowPlaying(): Promise<SpotifyTrack | null> {
     if (!res.ok) return null;
 
     const data = await res.json();
-
     if (!data.item) {
       return getRecentlyPlayed(accessToken);
     }
 
-    return {
+    const result: SpotifyTrack = {
       isPlaying: data.is_playing ?? false,
       title: data.item.name,
       artist: data.item.artists.map((a: any) => a.name).join(', '),
@@ -67,25 +80,75 @@ export async function getNowPlaying(): Promise<SpotifyTrack | null> {
       progressMs: data.progress_ms ?? 0,
       durationMs: data.item.duration_ms ?? 0,
     };
+
+    // Fetch context (playlist/album name)
+    if (data.context) {
+      const ctx = await resolveContext(accessToken, data.context);
+      if (ctx) {
+        result.contextName = ctx.name;
+        result.contextUrl = ctx.url;
+        result.contextType = ctx.type;
+      }
+    }
+
+    return result;
   } catch (e) {
     console.error('Spotify error:', e);
     return null;
   }
 }
 
+async function resolveContext(accessToken: string, context: any): Promise<{ name: string; url: string; type: string } | null> {
+  try {
+    const type = context.type; // playlist, album, artist
+    const uri = context.uri; // spotify:playlist:xxxxx
+    const id = uri.split(':').pop();
+    if (!id || !type) return null;
+
+    let apiUrl = '';
+    if (type === 'playlist') apiUrl = `https://api.spotify.com/v1/playlists/${id}?fields=name,external_urls`;
+    else if (type === 'album') apiUrl = `https://api.spotify.com/v1/albums/${id}`;
+    else if (type === 'artist') apiUrl = `https://api.spotify.com/v1/artists/${id}`;
+    else return null;
+
+    const res = await fetch(apiUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return {
+      name: data.name,
+      url: data.external_urls?.spotify ?? '',
+      type,
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function getRecentlyPlayed(accessToken: string): Promise<SpotifyTrack | null> {
+  // Return cached data if fresh enough
+  if (recentCache.data && Date.now() - recentCache.timestamp < RECENT_CACHE_TTL) {
+    return recentCache.data;
+  }
+
   try {
     const res = await fetch(RECENTLY_PLAYED_URL, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      if (res.status === 429 && recentCache.data) return recentCache.data;
+      return null;
+    }
 
     const data = await res.json();
-    const track = data.items?.[0]?.track;
+    const item = data.items?.[0];
+    const track = item?.track;
     if (!track) return null;
 
-    return {
+    const result: SpotifyTrack = {
       isPlaying: false,
       title: track.name,
       artist: track.artists.map((a: any) => a.name).join(', '),
@@ -95,7 +158,20 @@ async function getRecentlyPlayed(accessToken: string): Promise<SpotifyTrack | nu
       progressMs: track.duration_ms ?? 0,
       durationMs: track.duration_ms ?? 0,
     };
+
+    if (item.context) {
+      const ctx = await resolveContext(accessToken, item.context);
+      if (ctx) {
+        result.contextName = ctx.name;
+        result.contextUrl = ctx.url;
+        result.contextType = ctx.type;
+      }
+    }
+
+    recentCache = { data: result, timestamp: Date.now() };
+    return result;
   } catch {
+    if (recentCache.data) return recentCache.data;
     return null;
   }
 }

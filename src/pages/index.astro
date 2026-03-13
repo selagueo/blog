@@ -217,10 +217,13 @@ const projects = (await getCollection('projects'))
             return;
           }
 
+          // Link goes to song
           if (link) link.href = data.songUrl;
           var isLive = data.isPlaying;
           card.className = 'sp-card ' + (isLive ? 'sp-live' : 'sp-idle');
-          if (statusText) statusText.textContent = isLive ? 'Ahora estoy escuchando...' : 'Lo último que escuché...';
+          // Header: show context name if available, fallback to status
+          var defaultStatus = isLive ? 'Ahora estoy escuchando...' : 'Lo último que escuché...';
+          if (statusText) statusText.textContent = data.contextName || defaultStatus;
 
           // Album art
           if (data.albumArt && art) {
@@ -238,6 +241,11 @@ const projects = (await getCollection('projects'))
           var wideSpace = '\u2002\u2002';
           if (title) { title.textContent = data.title.replace(/ /g, wideSpace); maybeScroll(title); }
           if (artist) { artist.textContent = data.artist.replace(/ /g, wideSpace); maybeScroll(artist); }
+
+          // If context has a URL, make the card link to the playlist/album instead of the song
+          if (data.contextUrl && link) {
+            link.href = data.contextUrl;
+          }
 
           // Progress
           state.progressMs = data.progressMs || 0;
@@ -262,8 +270,9 @@ const projects = (await getCollection('projects'))
           if (st) st.textContent = 'Spotify offline';
         }
       }
+
       fetchNowPlaying();
-      setInterval(fetchNowPlaying, 15000);
+      setInterval(fetchNowPlaying, 30000);
     })();
   </script>
 
