@@ -1,0 +1,55 @@
+name: Convert HEIC images to JPG
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/images/**/*.heic'
+      - 'public/images/**/*.HEIC'
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install HEIC converter
+        run: sudo apt-get update && sudo apt-get install -y libheif-examples
+
+      - name: Convert HEIC files to JPG
+        run: |
+          shopt -s nullglob nocaseglob
+          converted=false
+          for heic_file in public/images/**/*.heic public/images/**/*.HEIC; do
+            jpg_file="${heic_file%.*}.jpg"
+            if [ ! -f "$jpg_file" ]; then
+              echo "Converting: $heic_file -> $jpg_file"
+              heif-convert -q 80 "$heic_file" "$jpg_file"
+              rm "$heic_file"
+              converted=true
+
+              # Update any MDX files referencing this HEIC
+              heic_basename=$(basename "$heic_file")
+              jpg_basename=$(basename "$jpg_file")
+              grep -rl "$heic_basename" src/content/ --include="*.mdx" | while read -r mdx_file; do
+                sed -i "s|$heic_basename|$jpg_basename|g" "$mdx_file"
+                echo "Updated reference in: $mdx_file"
+              done
+            fi
+          done
+
+          if [ "$converted" = false ]; then
+            echo "No HEIC files to convert"
+          fi
+
+      - name: Commit converted images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-convert HEIC images to JPG for web compatibility"
+            git push
+          fi
