@@ -20,7 +20,8 @@ const posts = (await getCollection('blog'))
           <span class="hero-name">José Lagos Guevara</span>
         </h1>
         <p class="text-lg md:text-xl text-(--color-text-secondary) leading-relaxed max-w-lg hero-fade hero-fade-delay-2">
-          Emprendedor, desarrollador, golfista, product designer, ingeniero, artista, uxer <span class="italic">(entre otras mentiras)</span>... Este es mi portfolio, blog y sandbox personal, bienvenid<span id="bienvenid-letter" class="inline-block overflow-hidden align-bottom" style="width:0.6em;height:1.2em;position:relative;"><span class="bienvenid-cycle">o</span></span>!
+          Emprendedor, desarrollador, golfista, product designer, ingeniero, artista, uxer <span class="italic">(entre otras mentiras)</span>... Este es mi portfolio, blog y sandbox personal, bienvenid<span id="bienvenid-letter"><span class="bienvenid-cycle">o</span></span>!
+
         </p>
         <div class="flex items-center gap-5 mt-8 hero-fade hero-fade-delay-3">
           <a href="/about" class="inline-flex items-center gap-2 px-5 py-2.5 bg-(--color-text) text-(--color-bg) rounded-full text-sm font-medium hover:opacity-80 transition-opacity">
@@ -276,27 +277,17 @@ const posts = (await getCollection('blog'))
 
   <style>
     #bienvenid-letter {
-      display: inline-block;
-      overflow: hidden;
-      vertical-align: bottom;
-      width: 0.65em;
-      height: 1.25em;
+      display: inline;
       position: relative;
     }
     .bienvenid-cycle {
-      display: block;
-      position: absolute;
-      left: 0;
-      width: 100%;
-      text-align: center;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+      display: inline;
+      transition: opacity 0.35s ease;
     }
     .bienvenid-exit {
-      transform: translateY(-100%);
       opacity: 0;
     }
     .bienvenid-enter {
-      transform: translateY(100%);
       opacity: 0;
     }
   </style>
