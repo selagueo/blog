@@ -7,9 +7,7 @@ const posts = (await getCollection('blog'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
-const projects = (await getCollection('projects'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
+
 ---
 
 <BaseLayout title="Inicio">
@@ -281,22 +279,6 @@ const projects = (await getCollection('projects'))
       <h2 class="text-xl font-semibold tracking-tight">Proyectos</h2>
       <a href="/projects" class="text-sm text-(--color-text-secondary) hover:text-(--color-text) transition-colors">Ver todos &rarr;</a>
     </div>
-    {projects.length > 0 ? (
-      <ul class="space-y-4">
-        {projects.map(project => (
-          <li>
-            <a href={`/projects/${project.id}`} class="group block">
-              <div class="flex items-baseline justify-between gap-4">
-                <span class="font-medium group-hover:text-(--color-accent) transition-colors">{project.data.title}</span>
-                <span class="text-xs px-2 py-0.5 bg-(--color-bg-secondary) rounded-full text-(--color-text-secondary)">{project.data.status}</span>
-              </div>
-              <p class="text-sm text-(--color-text-secondary) mt-1">{project.data.description}</p>
-            </a>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p class="text-(--color-text-secondary)">No hay proyectos todavía.</p>
-    )}
+    <p class="text-(--color-text-secondary)">Próximamente... 🚧</p>
   </section>
 </BaseLayout>
