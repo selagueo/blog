@@ -12,6 +12,7 @@ export interface Book {
   pages: number;
   link: string;
   review: string;
+  readAt: string;
 }
 
 async function fetchShelf(shelf: string): Promise<Book[]> {
@@ -35,6 +36,7 @@ async function fetchShelf(shelf: string): Promise<Book[]> {
     pages: Number(item.num_pages) || 0,
     link: item.link ?? '',
     review: stripHtml(item.user_review ?? ''),
+    readAt: item.user_read_at ?? '',
   }));
 }
 

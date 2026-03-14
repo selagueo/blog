@@ -12,15 +12,23 @@ function renderStars(rating: number): string {
 }
 
 const INITIAL_COUNT = 4;
-const YEARLY_GOAL = 15;
-const booksReadThisYear = read.length;
+const YEARLY_GOAL = 12;
+const currentYear = new Date().getFullYear();
+const booksReadThisYear = read.filter(b => {
+  if (!b.readAt) return false;
+  const readDate = new Date(b.readAt);
+  return readDate.getFullYear() === currentYear;
+}).length;
 const goalPercent = Math.min(Math.round((booksReadThisYear / YEARLY_GOAL) * 100), 100);
 
 const currentlyReading = reading.length > 0 ? reading[0] : null;
 
+const alquimista = read.find(b => b.title.toLowerCase().includes('alquimista'));
 const favouriteBook = {
   title: 'El Alquimista',
   author: 'Paulo Coelho',
+  cover: alquimista?.cover ?? '',
+  link: alquimista?.link ?? 'https://www.goodreads.com/book/show/45497',
 };
 
 const shelves: { id: string; label: string; books: Book[] }[] = [
@@ -82,9 +90,16 @@ const shelves: { id: string; label: string; books: Book[] }[] = [
         <span class="text-lg">⭐</span>
         <span class="text-xs font-medium uppercase tracking-wider text-(--color-text-secondary)">Mi favorito</span>
       </div>
-      <div class="min-w-0">
-        <p class="font-medium text-sm leading-tight">{favouriteBook.title}</p>
-        <p class="text-xs text-(--color-text-secondary) mt-0.5">{favouriteBook.author}</p>
+      <div class="flex items-center gap-3">
+        {favouriteBook.cover && (
+          <a href={favouriteBook.link} target="_blank" rel="noopener">
+            <img src={favouriteBook.cover} alt={favouriteBook.title} class="w-10 h-14 object-cover rounded shadow-sm" />
+          </a>
+        )}
+        <div class="min-w-0">
+          <p class="font-medium text-sm leading-tight">{favouriteBook.title}</p>
+          <p class="text-xs text-(--color-text-secondary) mt-0.5">{favouriteBook.author}</p>
+        </div>
       </div>
     </div>
   </div>
