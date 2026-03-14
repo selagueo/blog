@@ -1,35 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-
-const projects = (await getCollection('projects'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
 <BaseLayout title="Proyectos" description="Cosas que estoy construyendo y experimentando.">
   <h1 class="text-3xl font-semibold tracking-tight mb-2">Proyectos</h1>
   <p class="text-(--color-text-secondary) mb-10">Cosas que estoy construyendo y experimentando.</p>
 
-  {projects.length > 0 ? (
-    <ul class="space-y-6">
-      {projects.map(project => (
-        <li>
-          <a href={`/projects/${project.id}`} class="group block">
-            <div class="flex items-baseline justify-between gap-4">
-              <span class="font-medium group-hover:text-(--color-accent) transition-colors">{project.data.title}</span>
-              <span class="text-xs px-2 py-0.5 bg-(--color-bg-secondary) rounded-full text-(--color-text-secondary)">{project.data.status}</span>
-            </div>
-            <p class="text-sm text-(--color-text-secondary) mt-1">{project.data.description}</p>
-            <div class="flex gap-3 mt-2 text-xs text-(--color-text-secondary)">
-              {project.data.tags.map(tag => (
-                <span class="px-2 py-0.5 bg-(--color-bg-secondary) rounded-full">{tag}</span>
-              ))}
-            </div>
-          </a>
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p class="text-(--color-text-secondary)">No hay proyectos todavía.</p>
-  )}
+  <div class="flex flex-col items-center justify-center py-20 text-center">
+    <span class="text-4xl mb-4">🚧</span>
+    <p class="text-lg text-(--color-text-secondary)">Próximamente...</p>
+  </div>
 </BaseLayout>
