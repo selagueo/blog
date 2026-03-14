@@ -28,7 +28,10 @@ export const GET: APIRoute = async ({ url }) => {
   const tokenData = await tokenRes.json();
 
   if (tokenData.error) {
-    return new Response(`Auth error: ${tokenData.error_description}`, { status: 401 });
+    return new Response(
+      `Auth error: ${tokenData.error} — ${tokenData.error_description ?? 'no description'}\n\nFull response: ${JSON.stringify(tokenData)}`,
+      { status: 401 }
+    );
   }
 
   const token = tokenData.access_token;
