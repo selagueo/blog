@@ -12,6 +12,16 @@ function renderStars(rating: number): string {
 }
 
 const INITIAL_COUNT = 4;
+const YEARLY_GOAL = 15;
+const booksReadThisYear = read.length;
+const goalPercent = Math.min(Math.round((booksReadThisYear / YEARLY_GOAL) * 100), 100);
+
+const currentlyReading = reading.length > 0 ? reading[0] : null;
+
+const favouriteBook = {
+  title: 'El Alquimista',
+  author: 'Paulo Coelho',
+};
 
 const shelves: { id: string; label: string; books: Book[] }[] = [
   { id: 'reading', label: 'Leyendo ahora', books: reading },
@@ -23,9 +33,61 @@ const shelves: { id: string; label: string; books: Book[] }[] = [
 <BaseLayout title="Lecturas" description="Libros que estoy leyendo y que leí.">
   <h1 class="text-3xl font-semibold tracking-tight mb-2">Lecturas</h1>
   <p class="text-(--color-text-secondary) mb-2">Lo que estoy leyendo, lo que leí y lo que quiero leer.</p>
-  <p class="text-xs text-(--color-text-secondary) mb-10">
+  <p class="text-xs text-(--color-text-secondary) mb-8">
     Sincronizado con <a href="https://www.goodreads.com/user/show/198954569-jos-lagos" target="_blank" rel="noopener" class="text-(--color-accent) hover:underline">mi Goodreads</a>
   </p>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+    <!-- Books read this year -->
+    <div class="rounded-xl border border-(--color-border) p-5 bg-(--color-surface)">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-lg">📚</span>
+        <span class="text-xs font-medium uppercase tracking-wider text-(--color-text-secondary)">Meta 2026</span>
+      </div>
+      <div class="flex items-baseline gap-2 mb-3">
+        <span class="text-3xl font-bold">{booksReadThisYear}</span>
+        <span class="text-sm text-(--color-text-secondary)">/ {YEARLY_GOAL} libros</span>
+      </div>
+      <div class="w-full h-2 rounded-full bg-(--color-border) overflow-hidden">
+        <div class="h-full rounded-full bg-(--color-accent) transition-all duration-500" style={`width: ${goalPercent}%`}></div>
+      </div>
+      <span class="text-xs text-(--color-text-secondary) mt-2 block">{goalPercent}% completado</span>
+    </div>
+
+    <!-- Currently reading -->
+    <div class="rounded-xl border border-(--color-border) p-5 bg-(--color-surface)">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-lg">📖</span>
+        <span class="text-xs font-medium uppercase tracking-wider text-(--color-text-secondary)">Leyendo ahora</span>
+      </div>
+      {currentlyReading ? (
+        <div class="flex items-center gap-3">
+          {currentlyReading.cover && (
+            <img src={currentlyReading.cover} alt={currentlyReading.title} class="w-10 h-14 object-cover rounded shadow-sm" />
+          )}
+          <div class="min-w-0">
+            <p class="font-medium text-sm leading-tight truncate">{currentlyReading.title}</p>
+            <p class="text-xs text-(--color-text-secondary) mt-0.5 truncate">{currentlyReading.author}</p>
+          </div>
+        </div>
+      ) : (
+        <p class="text-sm text-(--color-text-secondary)">Nada por ahora</p>
+      )}
+    </div>
+
+    <!-- Favourite book -->
+    <div class="rounded-xl border border-(--color-border) p-5 bg-(--color-surface)">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-lg">⭐</span>
+        <span class="text-xs font-medium uppercase tracking-wider text-(--color-text-secondary)">Mi favorito</span>
+      </div>
+      <div class="min-w-0">
+        <p class="font-medium text-sm leading-tight">{favouriteBook.title}</p>
+        <p class="text-xs text-(--color-text-secondary) mt-0.5">{favouriteBook.author}</p>
+      </div>
+    </div>
+  </div>
 
   {shelves.map(shelf => shelf.books.length > 0 && (
     <section class="mb-12">
