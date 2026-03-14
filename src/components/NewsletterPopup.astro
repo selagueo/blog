@@ -1,0 +1,128 @@
+---
+// Popup that appears after scrolling 60% of a blog post
+---
+
+<div id="nl-popup-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display:none;">
+  <div id="nl-popup" class="relative w-full max-w-md rounded-2xl border border-(--color-border) bg-(--color-bg) p-6 sm:p-8 shadow-2xl">
+    <!-- Close button -->
+    <button id="nl-popup-close" class="absolute top-4 right-4 text-(--color-text-secondary) hover:text-(--color-text) transition-colors cursor-pointer" aria-label="Cerrar">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+        <line x1="4" y1="4" x2="16" y2="16" />
+        <line x1="16" y1="4" x2="4" y2="16" />
+      </svg>
+    </button>
+
+    <div class="text-center mb-5">
+      <span class="text-3xl mb-3 block">📬</span>
+      <h3 class="text-xl font-semibold text-(--color-text) mb-2">No te pierdas nada</h3>
+      <p class="text-sm text-(--color-text-secondary)">Suscribite al newsletter y recibí un email cada vez que publique algo nuevo.</p>
+    </div>
+
+    <form id="nl-popup-form" class="flex flex-col gap-3">
+      <input
+        id="nl-popup-email"
+        type="email"
+        placeholder="tu@email.com"
+        required
+        class="w-full px-4 py-3 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-sm text-(--color-text) placeholder:text-(--color-text-secondary) focus:outline-none focus:border-(--color-accent) transition-colors"
+      />
+      <button
+        type="submit"
+        id="nl-popup-btn"
+        class="w-full py-3 rounded-lg bg-(--color-accent) text-sm font-semibold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Suscribirme
+      </button>
+    </form>
+    <p id="nl-popup-msg" class="hidden text-xs text-center mt-3"></p>
+    <p class="text-xs text-(--color-text-secondary) text-center mt-4 opacity-60">Sin spam. Solo contenido genuino.</p>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  var overlay = document.getElementById('nl-popup-overlay');
+  var closeBtn = document.getElementById('nl-popup-close');
+  var form = document.getElementById('nl-popup-form');
+  var input = document.getElementById('nl-popup-email');
+  var btn = document.getElementById('nl-popup-btn');
+  var msg = document.getElementById('nl-popup-msg');
+  var shown = false;
+
+  // Don't show if already dismissed or subscribed
+  if (localStorage.getItem('nl-popup-dismissed')) return;
+
+  function showPopup() {
+    if (shown) return;
+    shown = true;
+    overlay.style.display = 'flex';
+    // Trigger animation
+    requestAnimationFrame(function() {
+      overlay.classList.remove('hidden');
+    });
+  }
+
+  function hidePopup() {
+    overlay.style.display = 'none';
+    localStorage.setItem('nl-popup-dismissed', '1');
+  }
+
+  // Show after scrolling 60% of the page
+  window.addEventListener('scroll', function() {
+    var scrollPercent = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+    if (scrollPercent > 0.6) showPopup();
+  }, { passive: true });
+
+  closeBtn.addEventListener('click', hidePopup);
+
+  // Close on overlay click (not popup itself)
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) hidePopup();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && overlay.style.display === 'flex') hidePopup();
+  });
+
+  // Form submission
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var email = input.value.trim();
+    if (!email) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    msg.classList.add('hidden');
+
+    fetch('/api/newsletter/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    })
+    .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+    .then(function(result) {
+      msg.classList.remove('hidden');
+      if (result.ok) {
+        msg.textContent = '¡Te suscribiste! Revisá tu email.';
+        msg.style.color = '#22c55e';
+        input.value = '';
+        localStorage.setItem('nl-popup-dismissed', '1');
+        setTimeout(hidePopup, 2000);
+      } else {
+        msg.textContent = result.data.error || 'Error al suscribirse.';
+        msg.style.color = '#FF9A2E';
+      }
+    })
+    .catch(function() {
+      msg.classList.remove('hidden');
+      msg.textContent = 'Error de conexión. Intentá de nuevo.';
+      msg.style.color = '#ef4444';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = 'Suscribirme';
+    });
+  });
+})();
+</script>

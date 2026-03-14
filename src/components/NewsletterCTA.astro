@@ -1,0 +1,74 @@
+---
+// Inline CTA block for end of blog posts
+---
+
+<aside class="mt-12 mb-4 rounded-xl border border-(--color-border) bg-(--color-bg-secondary) p-6 sm:p-8">
+  <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+    <div class="flex-1 min-w-0">
+      <p class="text-lg font-semibold text-(--color-text) mb-1">Te gustó lo que leíste?</p>
+      <p class="text-sm text-(--color-text-secondary)">Suscribite y recibí un email cuando publique algo nuevo.</p>
+    </div>
+    <form class="newsletter-inline-form flex gap-2 w-full sm:w-auto shrink-0">
+      <input
+        type="email"
+        placeholder="tu@email.com"
+        required
+        class="flex-1 sm:w-48 px-3 py-2 rounded-lg border border-(--color-border) bg-(--color-bg) text-sm text-(--color-text) placeholder:text-(--color-text-secondary) focus:outline-none focus:border-(--color-accent) transition-colors"
+      />
+      <button
+        type="submit"
+        class="px-4 py-2 rounded-lg bg-(--color-accent) text-sm font-medium text-white hover:opacity-90 transition-opacity cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Suscribirme
+      </button>
+    </form>
+  </div>
+  <p class="newsletter-inline-msg hidden text-xs mt-3"></p>
+</aside>
+
+<script is:inline>
+(function() {
+  document.querySelectorAll('.newsletter-inline-form').forEach(function(form) {
+    var input = form.querySelector('input[type="email"]');
+    var btn = form.querySelector('button');
+    var msg = form.closest('aside').querySelector('.newsletter-inline-msg');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      msg.classList.add('hidden');
+
+      fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      })
+      .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+      .then(function(result) {
+        msg.classList.remove('hidden');
+        if (result.ok) {
+          msg.textContent = '¡Te suscribiste! Revisá tu email.';
+          msg.style.color = '#22c55e';
+          input.value = '';
+        } else {
+          msg.textContent = result.data.error || 'Error al suscribirse.';
+          msg.style.color = '#FF9A2E';
+        }
+      })
+      .catch(function() {
+        msg.classList.remove('hidden');
+        msg.textContent = 'Error de conexión. Intentá de nuevo.';
+        msg.style.color = '#ef4444';
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Suscribirme';
+      });
+    });
+  });
+})();
+</script>

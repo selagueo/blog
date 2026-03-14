@@ -1,5 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import NewsletterCTA from '../components/NewsletterCTA.astro';
+import NewsletterPopup from '../components/NewsletterPopup.astro';
 
 interface Props {
   title: string;
@@ -36,5 +38,7 @@ const formattedDate = date.toLocaleDateString('es-AR', {
     <div class="prose">
       <slot />
     </div>
+    <NewsletterCTA />
   </article>
+  <NewsletterPopup />
 </BaseLayout>
