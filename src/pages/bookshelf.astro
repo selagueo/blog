@@ -12,7 +12,7 @@ function renderStars(rating: number): string {
 }
 
 const INITIAL_COUNT = 4;
-const YEARLY_GOAL = 12;
+const YEARLY_GOAL = 15;
 const currentYear = new Date().getFullYear();
 const booksReadThisYear = read.filter(b => {
   if (!b.readAt) return false;
@@ -48,7 +48,7 @@ const shelves: { id: string; label: string; books: Book[] }[] = [
   <!-- KPI Cards -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
     <!-- Books read this year -->
-    <div class="rounded-xl border border-(--color-border) p-5 bg-(--color-surface)">
+    <a href="https://www.goodreads.com/user_challenges/198954569" target="_blank" rel="noopener" class="block rounded-xl border border-(--color-border) p-5 bg-(--color-surface) no-underline transition-all duration-200 hover:border-(--color-accent) hover:bg-(--color-surface)/80 hover:scale-[1.02]">
       <div class="flex items-center gap-2 mb-3">
         <span class="text-lg">📚</span>
         <span class="text-xs font-medium uppercase tracking-wider text-(--color-text-secondary)">Meta 2026</span>
@@ -61,10 +61,10 @@ const shelves: { id: string; label: string; books: Book[] }[] = [
         <div class="h-full rounded-full bg-(--color-accent) transition-all duration-500" style={`width: ${goalPercent}%`}></div>
       </div>
       <span class="text-xs text-(--color-text-secondary) mt-2 block">{goalPercent}% completado</span>
-    </div>
+    </a>
 
     <!-- Currently reading -->
-    <div class="rounded-xl border border-(--color-border) p-5 bg-(--color-surface)">
+    <a href={currentlyReading?.link ?? '#'} target="_blank" rel="noopener" class="block rounded-xl border border-(--color-border) p-5 bg-(--color-surface) no-underline transition-all duration-200 hover:border-(--color-accent) hover:bg-(--color-surface)/80 hover:scale-[1.02]">
       <div class="flex items-center gap-2 mb-3">
         <span class="text-lg">📖</span>
         <span class="text-xs font-medium uppercase tracking-wider text-(--color-text-secondary)">Leyendo ahora</span>
@@ -82,26 +82,24 @@ const shelves: { id: string; label: string; books: Book[] }[] = [
       ) : (
         <p class="text-sm text-(--color-text-secondary)">Nada por ahora</p>
       )}
-    </div>
+    </a>
 
     <!-- Favourite book -->
-    <div class="rounded-xl border border-(--color-border) p-5 bg-(--color-surface)">
+    <a href={favouriteBook.link} target="_blank" rel="noopener" class="block rounded-xl border border-(--color-border) p-5 bg-(--color-surface) no-underline transition-all duration-200 hover:border-(--color-accent) hover:bg-(--color-surface)/80 hover:scale-[1.02]">
       <div class="flex items-center gap-2 mb-3">
         <span class="text-lg">⭐</span>
         <span class="text-xs font-medium uppercase tracking-wider text-(--color-text-secondary)">Mi favorito</span>
       </div>
       <div class="flex items-center gap-3">
         {favouriteBook.cover && (
-          <a href={favouriteBook.link} target="_blank" rel="noopener">
-            <img src={favouriteBook.cover} alt={favouriteBook.title} class="w-10 h-14 object-cover rounded shadow-sm" />
-          </a>
+          <img src={favouriteBook.cover} alt={favouriteBook.title} class="w-10 h-14 object-cover rounded shadow-sm" />
         )}
         <div class="min-w-0">
           <p class="font-medium text-sm leading-tight">{favouriteBook.title}</p>
           <p class="text-xs text-(--color-text-secondary) mt-0.5">{favouriteBook.author}</p>
         </div>
       </div>
-    </div>
+    </a>
   </div>
 
   {shelves.map(shelf => shelf.books.length > 0 && (
