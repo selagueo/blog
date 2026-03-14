@@ -1,0 +1,78 @@
+name: Send newsletter for new blog posts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/blog/**'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect new blog posts
+        id: detect
+        run: |
+          # Find newly added .mdx files in the blog directory
+          NEW_FILES=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'src/content/blog/*.mdx' || true)
+
+          if [ -z "$NEW_FILES" ]; then
+            echo "No new blog posts found"
+            echo "found=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "found=true" >> $GITHUB_OUTPUT
+
+          # Process the first new post
+          FILE=$(echo "$NEW_FILES" | head -1)
+          echo "Processing: $FILE"
+
+          # Extract frontmatter fields
+          TITLE=$(sed -n 's/^title: *//p' "$FILE" | head -1 | sed 's/^"//;s/"$//')
+          DESCRIPTION=$(sed -n 's/^description: *//p' "$FILE" | head -1 | sed 's/^"//;s/"$//')
+          BANNER=$(sed -n 's/^banner: *//p' "$FILE" | head -1 | sed 's/^"//;s/"$//')
+          DRAFT=$(sed -n 's/^draft: *//p' "$FILE" | head -1)
+
+          # Derive slug from filename
+          SLUG=$(basename "$FILE" .mdx)
+
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "description=$DESCRIPTION" >> $GITHUB_OUTPUT
+          echo "banner=$BANNER" >> $GITHUB_OUTPUT
+          echo "slug=$SLUG" >> $GITHUB_OUTPUT
+          echo "draft=$DRAFT" >> $GITHUB_OUTPUT
+
+          echo "Post: $TITLE (slug: $SLUG, draft: $DRAFT)"
+
+      - name: Wait for Vercel deployment
+        if: steps.detect.outputs.found == 'true' && steps.detect.outputs.draft != 'true'
+        run: sleep 60
+
+      - name: Send newsletter
+        if: steps.detect.outputs.found == 'true' && steps.detect.outputs.draft != 'true'
+        run: |
+          echo "Sending newsletter for: ${{ steps.detect.outputs.title }}"
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST https://selagueo.com/api/newsletter/send \
+            -H "Authorization: Bearer ${{ secrets.NEWSLETTER_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg slug "${{ steps.detect.outputs.slug }}" \
+              --arg title "${{ steps.detect.outputs.title }}" \
+              --arg description "${{ steps.detect.outputs.description }}" \
+              --arg banner "${{ steps.detect.outputs.banner }}" \
+              '{slug: $slug, title: $title, description: $description, banner: $banner}')")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -1)
+
+          echo "Response ($HTTP_CODE): $BODY"
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Failed to send newsletter"
+            exit 1
+          fi
