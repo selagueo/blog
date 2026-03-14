@@ -9,8 +9,8 @@ export const GET: APIRoute = async ({ url }) => {
     return new Response('Missing code parameter', { status: 400 });
   }
 
-  const clientId = import.meta.env.GITHUB_CLIENT_ID || process.env.GITHUB_CLIENT_ID;
-  const clientSecret = import.meta.env.GITHUB_CLIENT_SECRET || process.env.GITHUB_CLIENT_SECRET;
+  const clientId = process.env.GITHUB_CLIENT_ID ?? '';
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET ?? '';
 
   const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
