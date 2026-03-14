@@ -28,10 +28,7 @@ export const GET: APIRoute = async ({ url }) => {
   const tokenData = await tokenRes.json();
 
   if (tokenData.error) {
-    return new Response(
-      `Auth error: ${tokenData.error} — ${tokenData.error_description ?? 'no description'}\n\nFull response: ${JSON.stringify(tokenData)}\n\nDebug: clientId=${clientId?.slice(0, 8)}... secretLen=${clientSecret?.length} code=${code?.slice(0, 8)}... httpStatus=${tokenRes.status}`,
-      { status: 401 }
-    );
+    return new Response('Authentication failed. Please try again.', { status: 401 });
   }
 
   const token = tokenData.access_token;
