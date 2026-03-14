@@ -32,20 +32,25 @@ export const GET: APIRoute = async ({ url }) => {
   }
 
   const token = tokenData.access_token;
-  const messagePayload = JSON.stringify({ token, provider: 'github' });
+  // Escape token for safe embedding in JS string literal
+  const escapedToken = token.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
   const content = `<!DOCTYPE html>
 <html>
 <body>
 <script>
 (function() {
-  var payload = 'authorization:github:success:' + JSON.stringify(${messagePayload});
+  var token = "${escapedToken}";
+  var provider = "github";
   function receiveMessage(e) {
-    window.opener.postMessage(payload, e.origin);
+    window.opener.postMessage(
+      "authorization:" + provider + ":success:" + JSON.stringify({ token: token, provider: provider }),
+      e.origin
+    );
     window.removeEventListener("message", receiveMessage, false);
   }
   window.addEventListener("message", receiveMessage, false);
-  window.opener.postMessage("authorizing:github", "*");
+  window.opener.postMessage("authorizing:" + provider, "*");
 })();
 </script>
 </body>
