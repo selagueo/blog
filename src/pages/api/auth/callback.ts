@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ url }) => {
 
   if (tokenData.error) {
     return new Response(
-      `Auth error: ${tokenData.error} — ${tokenData.error_description ?? 'no description'}\n\nFull response: ${JSON.stringify(tokenData)}`,
+      `Auth error: ${tokenData.error} — ${tokenData.error_description ?? 'no description'}\n\nFull response: ${JSON.stringify(tokenData)}\n\nDebug: clientId=${clientId?.slice(0, 8)}... secretLen=${clientSecret?.length} code=${code?.slice(0, 8)}... httpStatus=${tokenRes.status}`,
       { status: 401 }
     );
   }
