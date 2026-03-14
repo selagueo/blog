@@ -10,21 +10,24 @@ const year = new Date().getFullYear();
         <h3 class="text-base font-semibold text-(--color-text) mb-1">Suscribite al newsletter</h3>
         <p class="text-xs">Recibí un email cuando publique algo nuevo.</p>
       </div>
-      <form id="newsletter-form" class="flex gap-2 w-full sm:w-auto">
-        <input
-          id="newsletter-email"
-          type="email"
-          placeholder="tu@email.com"
-          required
-          class="flex-1 sm:w-56 px-3 py-2 rounded-lg border border-(--color-border) bg-(--color-bg) text-sm text-(--color-text) placeholder:text-(--color-text-secondary) focus:outline-none focus:border-(--color-accent) transition-colors"
-        />
-        <button
-          type="submit"
-          id="newsletter-btn"
-          class="px-4 py-2 rounded-lg bg-(--color-accent) text-sm font-medium text-white hover:opacity-90 transition-opacity cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Suscribirme
-        </button>
+      <form id="newsletter-form" class="flex flex-col gap-2 w-full sm:w-auto">
+        <div class="flex gap-2">
+          <input
+            id="newsletter-email"
+            type="email"
+            placeholder="tu@email.com"
+            required
+            class="flex-1 sm:w-56 px-3 py-2 rounded-lg border border-(--color-border) bg-(--color-bg) text-sm text-(--color-text) placeholder:text-(--color-text-secondary) focus:outline-none focus:border-(--color-accent) transition-colors"
+          />
+          <button
+            type="submit"
+            id="newsletter-btn"
+            class="px-4 py-2 rounded-lg bg-(--color-accent) text-sm font-medium text-white hover:opacity-90 transition-opacity cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Suscribirme
+          </button>
+        </div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAACq8h8jd0CWb6lSD" data-theme="dark" data-size="compact"></div>
       </form>
     </div>
     <p id="newsletter-msg" class="hidden text-xs -mt-4"></p>
@@ -84,6 +87,15 @@ const year = new Date().getFullYear();
     var email = emailInput.value.trim();
     if (!email) return;
 
+    var turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
+    var turnstileToken = turnstileInput ? turnstileInput.value : '';
+    if (!turnstileToken) {
+      msg.classList.remove('hidden');
+      msg.textContent = 'Esperá a que se complete la verificación de seguridad.';
+      msg.style.color = '#FF9A2E';
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = 'Enviando...';
     msg.classList.add('hidden');
@@ -91,7 +103,7 @@ const year = new Date().getFullYear();
     fetch('/api/newsletter/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email })
+      body: JSON.stringify({ email: email, turnstileToken: turnstileToken })
     })
     .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
     .then(function(result) {
@@ -113,6 +125,11 @@ const year = new Date().getFullYear();
     .finally(function() {
       btn.disabled = false;
       btn.textContent = 'Suscribirme';
+      // Reset Turnstile for next attempt
+      if (window.turnstile) {
+        var widget = form.querySelector('.cf-turnstile');
+        if (widget) window.turnstile.reset(widget);
+      }
     });
   });
 </script>
