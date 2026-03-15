@@ -97,9 +97,14 @@ function getRelativeDate(date: Date): string {
                 <div class="flex-1 p-5 flex flex-col justify-center">
                   <div class="flex items-baseline justify-between gap-4 mb-1">
                     <h3 class="font-semibold text-lg group-hover:text-(--color-accent) transition-colors">{post.data.title}</h3>
-                    <span class="text-sm text-(--color-text-secondary) shrink-0">
-                      {getRelativeDate(post.data.date)}
-                    </span>
+                    <div class="flex items-center gap-2 text-sm text-(--color-text-secondary) shrink-0">
+                      <span>{getRelativeDate(post.data.date)}</span>
+                      <span class="opacity-30">·</span>
+                      <span class="flex items-center gap-1" data-views={post.id}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span class="view-count">—</span>
+                      </span>
+                    </div>
                   </div>
                   <p class="text-sm text-(--color-text-secondary) mb-3">{post.data.description}</p>
                   {post.data.tags.length > 0 && (
@@ -119,6 +124,23 @@ function getRelativeDate(date: Date): string {
       <p class="text-(--color-text-secondary)">No hay posts todavía.</p>
     )}
   </section>
+
+  <script is:inline>
+    (function() {
+      document.querySelectorAll('[data-views]').forEach(function(el) {
+        var slug = el.getAttribute('data-views');
+        fetch('/api/views/' + encodeURIComponent(slug))
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            var countEl = el.querySelector('.view-count');
+            if (countEl && typeof data.views === 'number') {
+              countEl.textContent = data.views;
+            }
+          })
+          .catch(function() {});
+      });
+    })();
+  </script>
 
   <script is:inline>
     (function() {

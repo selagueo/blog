@@ -234,6 +234,9 @@ const serializedPosts = posts.map(post => ({
         originalApplyFilters();
         updateViewCounts();
       };
+
+      // Fetch view counts for the initial render
+      updateViewCounts();
     })();
   </script>
 </BaseLayout>
