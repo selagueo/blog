@@ -86,6 +86,19 @@
     if (e.key === 'Escape' && overlay.style.display === 'flex') hidePopup();
   });
 
+  // Disable button until Turnstile is ready
+  btn.disabled = true;
+  btn.textContent = 'Verificando...';
+
+  var popupCheckInterval = setInterval(function() {
+    var turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
+    if (turnstileInput && turnstileInput.value) {
+      btn.disabled = false;
+      btn.textContent = 'Suscribirme';
+      clearInterval(popupCheckInterval);
+    }
+  }, 500);
+
   // Form submission
   form.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -96,7 +109,7 @@
     var turnstileToken = turnstileInput ? turnstileInput.value : '';
     if (!turnstileToken) {
       msg.classList.remove('hidden');
-      msg.textContent = 'Esperá a que se complete la verificación de seguridad.';
+      msg.textContent = 'Verificando que seas humano...';
       msg.style.color = '#FF9A2E';
       return;
     }

@@ -9,16 +9,16 @@
       <p class="text-sm text-(--color-text-secondary)">Suscribite y recibí un email cuando publique algo nuevo.</p>
     </div>
     <form class="newsletter-inline-form flex flex-col gap-2 w-full sm:w-auto shrink-0">
-      <div class="flex gap-2">
+      <div class="flex flex-col sm:flex-row gap-2">
         <input
           type="email"
           placeholder="tu@email.com"
           required
-          class="flex-1 sm:w-48 px-3 py-2 rounded-lg border border-(--color-border) bg-(--color-bg) text-sm text-(--color-text) placeholder:text-(--color-text-secondary) focus:outline-none focus:border-(--color-accent) transition-colors"
+          class="w-full sm:w-48 px-3 py-2 rounded-lg border border-(--color-border) bg-(--color-bg) text-sm text-(--color-text) placeholder:text-(--color-text-secondary) focus:outline-none focus:border-(--color-accent) transition-colors"
         />
         <button
           type="submit"
-          class="px-4 py-2 rounded-lg bg-(--color-accent) text-sm font-medium text-white hover:opacity-90 transition-opacity cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full sm:w-auto px-4 py-2 rounded-lg bg-(--color-accent) text-sm font-medium text-white hover:opacity-90 transition-opacity cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Suscribirme
         </button>
@@ -36,6 +36,23 @@
     var btn = form.querySelector('button');
     var msg = form.closest('aside').querySelector('.newsletter-inline-msg');
 
+    // Disable button until Turnstile is ready
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+    msg.classList.remove('hidden');
+    msg.textContent = 'Verificando que seas humano...';
+    msg.style.color = 'var(--color-text-secondary)';
+
+    var checkInterval = setInterval(function() {
+      var turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
+      if (turnstileInput && turnstileInput.value) {
+        btn.disabled = false;
+        btn.textContent = 'Suscribirme';
+        msg.classList.add('hidden');
+        clearInterval(checkInterval);
+      }
+    }, 500);
+
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       var email = input.value.trim();
@@ -45,7 +62,7 @@
       var turnstileToken = turnstileInput ? turnstileInput.value : '';
       if (!turnstileToken) {
         msg.classList.remove('hidden');
-        msg.textContent = 'Esperá a que se complete la verificación de seguridad.';
+        msg.textContent = 'Esperá a que se complete la verificación.';
         msg.style.color = '#FF9A2E';
         return;
       }
