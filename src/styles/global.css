@@ -368,3 +368,86 @@ html.dark .hero-name {
   background: #555;
   box-shadow: none;
 }
+
+/* ═══════════════════════════════════════
+   Mesh Gradient Background
+   ═══════════════════════════════════════ */
+
+@keyframes mesh-drift-1 {
+  0% { transform: translate(0%, 0%); }
+  25% { transform: translate(2%, -3%); }
+  50% { transform: translate(-1%, 2%); }
+  75% { transform: translate(1%, -1%); }
+  100% { transform: translate(0%, 0%); }
+}
+
+@keyframes mesh-drift-2 {
+  0% { transform: translate(0%, 0%); }
+  25% { transform: translate(-2%, 2%); }
+  50% { transform: translate(1%, -2%); }
+  75% { transform: translate(-1%, 1%); }
+  100% { transform: translate(0%, 0%); }
+}
+
+@keyframes mesh-drift-3 {
+  0% { transform: translate(0%, 0%); }
+  25% { transform: translate(1%, 1%); }
+  50% { transform: translate(-2%, -1%); }
+  75% { transform: translate(2%, 0%); }
+  100% { transform: translate(0%, 0%); }
+}
+
+.mesh-gradient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.mesh-gradient-bg::before {
+  content: '';
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  top: -25%;
+  left: -25%;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 131, 0, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 131, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 157, 46, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 131, 0, 0.08) 0%, transparent 50%);
+  animation: mesh-drift-1 20s ease-in-out infinite;
+}
+
+.mesh-gradient-bg::after {
+  content: '';
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  top: -25%;
+  left: -25%;
+  background:
+    radial-gradient(circle at 60% 40%, rgba(255, 158, 46, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 30% 70%, rgba(255, 131, 0, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(255, 131, 0, 0.08) 0%, transparent 50%);
+  animation: mesh-drift-2 25s ease-in-out infinite;
+}
+
+html.dark .mesh-gradient-bg::before {
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 154, 46, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 131, 0, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 157, 46, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 131, 0, 0.04) 0%, transparent 50%);
+}
+
+html.dark .mesh-gradient-bg::after {
+  background:
+    radial-gradient(circle at 60% 40%, rgba(255, 158, 46, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 30% 70%, rgba(255, 131, 0, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(255, 131, 0, 0.04) 0%, transparent 50%);
+}
