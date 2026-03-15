@@ -3,17 +3,28 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Sobre mí" description="Sobre José Lagos.">
-  <h1 class="text-3xl font-semibold tracking-tight mb-4">Sobre mí</h1>
+  <h1 class="text-3xl font-semibold tracking-tight mb-8">Sobre mí</h1>
+
+  <div class="flex flex-col sm:flex-row gap-8 mb-8">
+    <div class="shrink-0">
+      <img
+        src="/images/profile.jpg"
+        alt="José Lagos"
+        class="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl object-cover"
+      />
+    </div>
+    <div class="prose">
+      <p>
+        Hola, soy José Lagos. Desarrollador, maker y escritor ocasional.
+      </p>
+
+      <p>
+        Me gusta construir cosas para la web, leer y descubrir música nueva. Este sitio es mi espacio personal para compartir lo que estoy haciendo y pensando.
+      </p>
+    </div>
+  </div>
 
   <div class="prose">
-    <p>
-      Hola, soy José Lagos. Desarrollador, maker y escritor ocasional.
-    </p>
-
-    <p>
-      Me gusta construir cosas para la web, leer y descubrir música nueva. Este sitio es mi espacio personal para compartir lo que estoy haciendo y pensando.
-    </p>
-
     <p>
       Me podés encontrar en <a href="https://instagram.com/selagueo" target="_blank" rel="noopener">Instagram</a>, <a href="https://github.com/selagueo" target="_blank" rel="noopener">GitHub</a> y <a href="https://linkedin.com/in/selagueo" target="_blank" rel="noopener">LinkedIn</a> como <strong>@selagueo</strong>.
     </p>
