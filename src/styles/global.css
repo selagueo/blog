@@ -370,36 +370,72 @@ html.dark .hero-name {
 }
 
 /* Light mode Spotify player */
-:not(.dark) .sp-card.sp-idle {
+html:not(.dark) .sp-card.sp-idle {
   background: #f5f5f5;
   border: 1px solid #e0e0e0;
 }
 
-:not(.dark) .sp-idle .sp-header-text {
+html:not(.dark) .sp-idle .sp-header-text {
   color: #555;
 }
 
-:not(.dark) .sp-idle .sp-logo {
+html:not(.dark) .sp-idle .sp-logo {
   color: #333;
 }
 
-:not(.dark) .sp-idle .sp-title {
+html:not(.dark) .sp-idle .sp-title {
   color: #222;
   text-shadow: none;
 }
 
-:not(.dark) .sp-idle .sp-artist {
+html:not(.dark) .sp-idle .sp-artist {
   color: #666;
 }
 
-:not(.dark) .sp-idle .sp-time {
+html:not(.dark) .sp-idle .sp-time {
   color: #666;
 }
 
-:not(.dark) .sp-idle .sp-bar-bg {
+html:not(.dark) .sp-idle .sp-bar-bg {
   background: #d8d8d8;
 }
 
-:not(.dark) .sp-idle .sp-bar-fill {
+html:not(.dark) .sp-idle .sp-bar-fill {
   background: #888;
+}
+
+/* Light mode Spotify live player */
+html:not(.dark) .sp-card.sp-live {
+  background: #f0f7f0;
+  border: 1px solid #c8e6c8;
+}
+
+html:not(.dark) .sp-live .sp-header-text {
+  color: #2d6a2d;
+}
+
+html:not(.dark) .sp-live .sp-logo {
+  color: #2d6a2d;
+}
+
+html:not(.dark) .sp-live .sp-title {
+  color: #1a4d1a;
+  text-shadow: none;
+}
+
+html:not(.dark) .sp-live .sp-artist {
+  color: #3d7a3d;
+}
+
+html:not(.dark) .sp-live .sp-time {
+  color: #3d7a3d;
+}
+
+html:not(.dark) .sp-live .sp-bar-bg {
+  background: #d4e8d4;
+}
+
+html:not(.dark) .sp-live .sp-bar-fill {
+  background: #2d8a2d;
+  box-shadow: none;
 }
