@@ -18,9 +18,39 @@ const formattedDate = date.toLocaleDateString('es-AR', {
   month: 'long',
   day: 'numeric',
 });
+
+const isoDate = date.toISOString();
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImage = banner ? new URL(banner, Astro.site).toString() : new URL('/og-default.jpg', Astro.site).toString();
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "description": description,
+  "image": ogImage,
+  "datePublished": isoDate,
+  "dateModified": isoDate,
+  "author": {
+    "@type": "Person",
+    "name": "José Lagos Guevara",
+    "url": "https://selagueo.com/about"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "José Lagos Guevara",
+    "url": "https://selagueo.com"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": canonicalURL.toString()
+  },
+  ...(tags.length > 0 && { "keywords": tags.join(", ") })
+};
 ---
 
-<BaseLayout title={title} description={description} image={banner} type="article">
+<BaseLayout title={title} description={description} image={banner} type="article" publishedTime={isoDate} tags={tags}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <article>
     <!-- Banner with overlaid header -->
     {banner ? (
