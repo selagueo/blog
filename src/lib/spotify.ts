@@ -1,6 +1,6 @@
-const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || import.meta.env.SPOTIFY_CLIENT_ID;
-const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || import.meta.env.SPOTIFY_CLIENT_SECRET;
-const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN || import.meta.env.SPOTIFY_REFRESH_TOKEN;
+const CLIENT_ID = (process.env.SPOTIFY_CLIENT_ID || import.meta.env.SPOTIFY_CLIENT_ID || '').trim();
+const CLIENT_SECRET = (process.env.SPOTIFY_CLIENT_SECRET || import.meta.env.SPOTIFY_CLIENT_SECRET || '').trim();
+const REFRESH_TOKEN = (process.env.SPOTIFY_REFRESH_TOKEN || import.meta.env.SPOTIFY_REFRESH_TOKEN || '').trim();
 
 const BASIC_AUTH = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
 const TOKEN_URL = 'https://accounts.spotify.com/api/token';
@@ -45,6 +45,9 @@ async function getAccessToken(): Promise<string> {
   });
 
   const data = await res.json();
+  if (!data.access_token) {
+    throw new Error(`Token refresh failed: ${JSON.stringify(data)}`);
+  }
   tokenCache = { token: data.access_token, expiresAt: Date.now() + (data.expires_in - 60) * 1000 };
   return data.access_token;
 }
@@ -92,9 +95,9 @@ export async function getNowPlaying(): Promise<SpotifyTrack | null> {
     }
 
     return result;
-  } catch (e) {
+  } catch (e: any) {
     console.error('Spotify error:', e);
-    return null;
+    throw e; // Re-throw so the API route can capture it
   }
 }
 
