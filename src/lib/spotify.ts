@@ -1,6 +1,6 @@
-const CLIENT_ID = import.meta.env.SPOTIFY_CLIENT_ID;
-const CLIENT_SECRET = import.meta.env.SPOTIFY_CLIENT_SECRET;
-const REFRESH_TOKEN = import.meta.env.SPOTIFY_REFRESH_TOKEN;
+const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || import.meta.env.SPOTIFY_CLIENT_ID;
+const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || import.meta.env.SPOTIFY_CLIENT_SECRET;
+const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN || import.meta.env.SPOTIFY_REFRESH_TOKEN;
 
 const BASIC_AUTH = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
 const TOKEN_URL = 'https://accounts.spotify.com/api/token';
