@@ -1,0 +1,80 @@
+---
+// Canvas-based mesh gradient for homepage only
+---
+
+<div id="mesh-gradient-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; pointer-events: none;">
+  <canvas id="mesh-gradient-canvas"></canvas>
+</div>
+
+<script is:inline>
+(function() {
+  const canvas = document.getElementById('mesh-gradient-canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Only run on homepage
+  if (window.location.pathname !== '/') return;
+
+  // Set canvas size
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  // Colors from Paper Design: fff4e0, 805a28, f7c250, d48b4e
+  const colors = [
+    { r: 255, g: 244, b: 224 },  // fff4e0
+    { r: 128, g: 90, b: 40 },    // 805a28
+    { r: 247, g: 194, b: 80 },   // f7c250
+    { r: 212, g: 139, b: 78 }    // d48b4e
+  ];
+
+  // Mesh gradient points
+  let points = [
+    { x: 0.2, y: 0.5, vx: 0.001, vy: 0.0008, color: colors[0] },
+    { x: 0.8, y: 0.2, vx: -0.0012, vy: 0.0009, color: colors[1] },
+    { x: 0.5, y: 0.8, vx: 0.0009, vy: -0.0011, color: colors[2] },
+    { x: 0.7, y: 0.6, vx: -0.0008, vy: 0.0007, color: colors[3] }
+  ];
+
+  function animate() {
+    // Clear canvas
+    ctx.fillStyle = 'rgb(10, 10, 10)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Update point positions
+    points.forEach(point => {
+      point.x += point.vx;
+      point.y += point.vy;
+
+      // Bounce at edges
+      if (point.x < 0 || point.x > 1) point.vx *= -1;
+      if (point.y < 0 || point.y > 1) point.vy *= -1;
+
+      // Clamp within bounds
+      point.x = Math.max(0, Math.min(1, point.x));
+      point.y = Math.max(0, Math.min(1, point.y));
+    });
+
+    // Draw radial gradients for each point
+    points.forEach(point => {
+      const gradient = ctx.createRadialGradient(
+        point.x * canvas.width, point.y * canvas.height, 0,
+        point.x * canvas.width, point.y * canvas.height, Math.max(canvas.width, canvas.height) * 0.6
+      );
+
+      const alpha = 0.4;
+      gradient.addColorStop(0, `rgba(${point.color.r}, ${point.color.g}, ${point.color.b}, ${alpha})`);
+      gradient.addColorStop(1, `rgba(${point.color.r}, ${point.color.g}, ${point.color.b}, 0)`);
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+})();
+</script>

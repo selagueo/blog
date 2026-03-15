@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeMeshGradient from '../components/HomeMeshGradient.astro';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('blog'))
@@ -11,6 +12,7 @@ const posts = (await getCollection('blog'))
 ---
 
 <BaseLayout title="Inicio">
+  <HomeMeshGradient />
   <!-- Hero + LCD Player -->
   <section class="min-h-[calc(100vh-88px)] flex flex-col justify-center mb-20">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-10">
