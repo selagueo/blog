@@ -31,20 +31,20 @@ const formattedDate = date.toLocaleDateString('es-AR', {
           class="w-full aspect-[21/9] object-cover"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/10"></div>
-        <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
-          <div class="flex items-center gap-3 text-sm text-white/60 mb-3">
-            <span class="flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              {formattedDate}
+        <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-10">
+          <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-white/60 mb-2 sm:mb-3">
+            <span class="flex items-center gap-1 sm:gap-1.5 min-w-0">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sm:w-[14px] sm:h-[14px] shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span class="truncate">{formattedDate}</span>
             </span>
-            <span class="opacity-30">·</span>
-            <span id="view-count" class="flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="opacity-30 shrink-0">·</span>
+            <span id="view-count" class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sm:w-[14px] sm:h-[14px]"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <span id="view-number">—</span>
             </span>
           </div>
-          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-white">{title}</h1>
-          <p class="text-lg text-white/60 max-w-2xl">{description}</p>
+          <h1 class="text-xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2 sm:mb-3 text-white line-clamp-3">{title}</h1>
+          <p class="text-sm sm:text-lg text-white/60 max-w-2xl line-clamp-2">{description}</p>
         </div>
       </div>
     ) : (

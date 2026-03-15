@@ -298,39 +298,39 @@ html.dark .hero-name {
 
 /* ── Live state ── */
 .sp-card.sp-live {
-  background: #0c1a0c;
-  border: 1px solid #1a3a1a;
+  background: #1a3a1a;
+  border: 1px solid #2d5a2d;
 }
 
 .sp-live .sp-header-text {
-  color: #33ff33;
+  color: #1a7a1a;
 }
 
 .sp-live .sp-logo {
-  color: #33ff33;
-  opacity: 0.8;
+  color: #1a7a1a;
+  opacity: 0.9;
 }
 
 .sp-live .sp-title {
-  color: #33ff33;
-  text-shadow: 0 0 8px rgba(51, 255, 51, 0.3);
+  color: #0d5a0d;
+  text-shadow: 0 0 4px rgba(26, 122, 26, 0.2);
 }
 
 .sp-live .sp-artist {
-  color: #1a8a1a;
+  color: #2d5a2d;
 }
 
 .sp-live .sp-time {
-  color: #1a8a1a;
+  color: #2d5a2d;
 }
 
 .sp-live .sp-bar-bg {
-  background: #0a200a;
+  background: #2d5a2d;
 }
 
 .sp-live .sp-bar-fill {
-  background: #33ff33;
-  box-shadow: 0 0 4px rgba(51, 255, 51, 0.4);
+  background: #1a7a1a;
+  box-shadow: 0 0 2px rgba(26, 122, 26, 0.3);
 }
 
 /* ── Idle state ── */
