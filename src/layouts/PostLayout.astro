@@ -8,9 +8,10 @@ interface Props {
   description: string;
   date: Date;
   tags?: string[];
+  banner?: string;
 }
 
-const { title, description, date, tags = [] } = Astro.props;
+const { title, description, date, tags = [], banner } = Astro.props;
 
 const formattedDate = date.toLocaleDateString('es-AR', {
   year: 'numeric',
@@ -21,24 +22,86 @@ const formattedDate = date.toLocaleDateString('es-AR', {
 
 <BaseLayout title={title} description={description}>
   <article>
-    <header class="mb-10">
-      <p class="text-sm text-(--color-text-secondary) mb-2">{formattedDate}</p>
-      <h1 class="text-3xl font-semibold tracking-tight mb-3">{title}</h1>
-      <p class="text-(--color-text-secondary)">{description}</p>
-      {tags.length > 0 && (
-        <div class="flex gap-2 mt-4">
-          {tags.map(tag => (
-            <span class="text-xs px-2 py-1 bg-(--color-bg-secondary) rounded-full text-(--color-text-secondary)">
-              {tag}
+    <!-- Banner with overlaid header -->
+    {banner ? (
+      <div class="relative overflow-hidden mb-8 hero-fade hero-fade-delay-1">
+        <img
+          src={banner}
+          alt={title}
+          class="w-full aspect-[21/9] object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/10"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
+          <div class="flex items-center gap-3 text-sm text-white/60 mb-3">
+            <span class="flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              {formattedDate}
             </span>
-          ))}
+            <span class="opacity-30">·</span>
+            <span id="view-count" class="flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span id="view-number">—</span>
+            </span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-white">{title}</h1>
+          <p class="text-lg text-white/60 max-w-2xl">{description}</p>
         </div>
-      )}
-    </header>
-    <div class="prose">
+      </div>
+    ) : (
+      <header class="mb-10 hero-fade hero-fade-delay-1">
+        <div class="flex items-center gap-3 text-sm text-(--color-text-secondary) mb-3">
+          <span class="flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {formattedDate}
+          </span>
+          <span class="opacity-30">·</span>
+          <span id="view-count" class="flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="view-number">—</span>
+          </span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3">{title}</h1>
+        <p class="text-lg text-(--color-text-secondary) max-w-2xl">{description}</p>
+      </header>
+    )}
+
+    <!-- Tags -->
+    {tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-8 hero-fade hero-fade-delay-1">
+        {tags.map(tag => (
+          <span class="text-xs px-2.5 py-1 rounded-full border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-secondary)">
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+
+    <!-- Divider -->
+    <div class="w-12 h-0.5 bg-(--color-accent) mb-10 hero-fade hero-fade-delay-2"></div>
+
+    <!-- Content -->
+    <div class="prose hero-fade hero-fade-delay-2">
       <slot />
     </div>
     <NewsletterCTA />
   </article>
   <NewsletterPopup />
+
+  <script is:inline>
+    (function() {
+      var path = window.location.pathname;
+      var slug = path.replace(/^\/blog\//, '').replace(/\/$/, '');
+      if (!slug) return;
+
+      fetch('/api/views/' + encodeURIComponent(slug), { method: 'POST' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var el = document.getElementById('view-number');
+          if (el && typeof data.views === 'number') {
+            el.textContent = data.views;
+          }
+        })
+        .catch(function() {});
+    })();
+  </script>
 </BaseLayout>
