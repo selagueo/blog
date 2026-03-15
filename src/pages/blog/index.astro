@@ -15,6 +15,7 @@ const serializedPosts = posts.map(post => ({
   dateFormatted: post.data.date.toLocaleDateString('es-AR', { month: 'short', day: 'numeric', year: 'numeric' }),
   tags: post.data.tags,
   banner: post.data.banner,
+  slug: post.id,
 }));
 ---
 
@@ -103,7 +104,14 @@ const serializedPosts = posts.map(post => ({
               '<div class="flex-1 p-5 flex flex-col justify-center">' +
                 '<div class="flex items-baseline justify-between gap-4 mb-1">' +
                   '<h2 class="font-semibold text-lg group-hover:text-(--color-accent) transition-colors">' + post.title + '</h2>' +
-                  '<span class="text-sm text-(--color-text-secondary) shrink-0">' + post.dateFormatted + '</span>' +
+                  '<div class="flex items-center gap-2 text-sm text-(--color-text-secondary) shrink-0 whitespace-nowrap">' +
+                    '<span>' + post.dateFormatted + '</span>' +
+                    '<span class="opacity-30">·</span>' +
+                    '<span class="flex items-center gap-1" data-views="' + post.slug + '">' +
+                      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+                      '<span class="view-count">—</span>' +
+                    '</span>' +
+                  '</div>' +
                 '</div>' +
                 '<p class="text-sm text-(--color-text-secondary) mb-3">' + post.description + '</p>' +
                 (post.tags.length > 0 ?
@@ -181,6 +189,37 @@ const serializedPosts = posts.map(post => ({
 
       // Initial render
       applyFilters();
+
+      // Fetch and display view counts
+      function updateViewCounts() {
+        var elements = listEl.querySelectorAll('[data-views]');
+        elements.forEach(function(el) {
+          var slug = el.getAttribute('data-views');
+          fetch('/api/views/' + encodeURIComponent(slug))
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+              var countEl = el.querySelector('.view-count');
+              if (countEl && typeof data.views === 'number') {
+                countEl.textContent = data.views;
+              }
+            })
+            .catch(function() {});
+        });
+      }
+
+      // Update view counts after render
+      var originalRender = render;
+      render = function() {
+        originalRender();
+        updateViewCounts();
+      };
+
+      // Also update on search/sort
+      var originalApplyFilters = applyFilters;
+      applyFilters = function() {
+        originalApplyFilters();
+        updateViewCounts();
+      };
     })();
   </script>
 </BaseLayout>
